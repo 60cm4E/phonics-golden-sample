@@ -79,6 +79,17 @@ const STAGES = [
     mouth:'두 가지 소리. /오우/(snow) 또는 /아우/(cow).' },
   { key:'oi_oy', level:4, label:'이중모음 oi/oy', sound:'오이', color:'#7C3AED',
     mouth:'oi와 oy 모두 /오이/ 소리. oy는 주로 단어 끝.' },
+  // ─── Level 5: 사이트워드 (통째 외우기) ───
+  { key:'sw1', level:5, label:'사이트워드 1군', sound:'-', color:'#0891B2',
+    mouth:'자주 쓰이는 단어들. 파닉스 규칙이 잘 안 맞아 통째로 외워요.' },
+  { key:'sw2', level:5, label:'사이트워드 2군', sound:'-', color:'#0E7490',
+    mouth:'자주 쓰이는 단어들. 파닉스 규칙이 잘 안 맞아 통째로 외워요.' },
+  { key:'sw3', level:5, label:'사이트워드 3군', sound:'-', color:'#7C3AED',
+    mouth:'자주 쓰이는 단어들. 파닉스 규칙이 잘 안 맞아 통째로 외워요.' },
+  { key:'sw4', level:5, label:'사이트워드 4군', sound:'-', color:'#9333EA',
+    mouth:'자주 쓰이는 단어들. 파닉스 규칙이 잘 안 맞아 통째로 외워요.' },
+  { key:'sw5', level:5, label:'사이트워드 5군', sound:'-', color:'#BE185D',
+    mouth:'자주 쓰이는 단어들. 파닉스 규칙이 잘 안 맞아 통째로 외워요.' },
 ];
 
 /* =========================================================
@@ -267,6 +278,67 @@ const WORDS = {
     { word:'toy', meaning:'장난감', sounds:[['t','트'],['oy','오이']], read:'트오이', fast:'토이' },
     { word:'joy', meaning:'기쁨', sounds:[['j','즈'],['oy','오이']], read:'즈오이', fast:'조이' },
   ],
+  // ─── Level 5: 사이트워드 ───
+  sw1: [
+    { word:'the', meaning:'그/관사', sounds:[['th','드'], ['e','으']], read:'드으', fast:'더' },
+    { word:'a', meaning:'하나의', sounds:[['a','어']], read:'어', fast:'어' },
+    { word:'I', meaning:'나', sounds:[['I','아이']], read:'아이', fast:'아이' },
+    { word:'is', meaning:'~이다', sounds:[['i','이'], ['s','즈']], read:'이즈', fast:'이즈' },
+    { word:'you', meaning:'너', sounds:[['y','이'], ['ou','우']], read:'이우', fast:'유' },
+    { word:'to', meaning:'~에', sounds:[['t','트'], ['o','우']], read:'트우', fast:'투' },
+    { word:'of', meaning:'~의', sounds:[['o','어'], ['f','브']], read:'어브', fast:'어브' },
+    { word:'and', meaning:'그리고', sounds:[['a','애'], ['n','은'], ['d','드']], read:'애은드', fast:'앤드' },
+    { word:'in', meaning:'~안에', sounds:[['i','이'], ['n','은']], read:'이은', fast:'인' },
+    { word:'it', meaning:'그것', sounds:[['i','이'], ['t','트']], read:'이트', fast:'잇' },
+  ],
+  sw2: [
+    { word:'have', meaning:'가지다', sounds:[['h','흐'], ['a','애'], ['v','브'], ['e','매직e']], read:'흐애브', fast:'해브' },
+    { word:'do', meaning:'하다', sounds:[['d','드'], ['o','우']], read:'드우', fast:'두' },
+    { word:'can', meaning:'할수있다', sounds:[['c','크'], ['a','애'], ['n','은']], read:'크애은', fast:'캔' },
+    { word:'go', meaning:'가다', sounds:[['g','그'], ['o','오우']], read:'그오우', fast:'고' },
+    { word:'see', meaning:'보다', sounds:[['s','쓰'], ['ee','이-']], read:'쓰이', fast:'씨' },
+    { word:'want', meaning:'원하다', sounds:[['w','워'], ['a','아'], ['n','은'], ['t','트']], read:'워아은트', fast:'원트' },
+    { word:'like', meaning:'좋아하다', sounds:[['l','르'], ['i','아이'], ['k','크'], ['e','매직e']], read:'르아이크', fast:'라이크' },
+    { word:'know', meaning:'알다', sounds:[['kn','느'], ['ow','오우']], read:'느오우', fast:'노' },
+    { word:'look', meaning:'보다', sounds:[['l','르'], ['oo','우'], ['k','크']], read:'르우크', fast:'룩' },
+    { word:'come', meaning:'오다', sounds:[['c','크'], ['o','어'], ['m','음'], ['e','매직e']], read:'크어음', fast:'컴' },
+  ],
+  sw3: [
+    { word:'my', meaning:'나의', sounds:[['m','므'], ['y','아이']], read:'므아이', fast:'마이' },
+    { word:'your', meaning:'너의', sounds:[['y','이'], ['our','어r']], read:'이어r', fast:'유어' },
+    { word:'he', meaning:'그(남)', sounds:[['h','흐'], ['e','이']], read:'흐이', fast:'히' },
+    { word:'she', meaning:'그녀', sounds:[['sh','쉬'], ['e','이']], read:'쉬이', fast:'쉬' },
+    { word:'we', meaning:'우리', sounds:[['w','워'], ['e','이']], read:'워이', fast:'위' },
+    { word:'they', meaning:'그들', sounds:[['th','드'], ['ey','에이']], read:'드에이', fast:'데이' },
+    { word:'this', meaning:'이것', sounds:[['th','드'], ['i','이'], ['s','스']], read:'드이스', fast:'디스' },
+    { word:'that', meaning:'저것', sounds:[['th','드'], ['a','애'], ['t','트']], read:'드애트', fast:'댓' },
+    { word:'was', meaning:'였다', sounds:[['w','워'], ['a','어'], ['s','즈']], read:'워어즈', fast:'워즈' },
+    { word:'said', meaning:'말했다', sounds:[['s','쓰'], ['ai','에'], ['d','드']], read:'쓰에드', fast:'쎄드' },
+  ],
+  sw4: [
+    { word:'what', meaning:'무엇', sounds:[['wh','워'], ['a','어'], ['t','트']], read:'워어트', fast:'왓' },
+    { word:'when', meaning:'언제', sounds:[['wh','워'], ['e','에'], ['n','은']], read:'워에은', fast:'웬' },
+    { word:'where', meaning:'어디', sounds:[['wh','워'], ['ere','에어']], read:'워에어', fast:'웨어' },
+    { word:'who', meaning:'누구', sounds:[['wh','흐'], ['o','우']], read:'흐우', fast:'후' },
+    { word:'why', meaning:'왜', sounds:[['wh','워'], ['y','아이']], read:'워아이', fast:'와이' },
+    { word:'how', meaning:'어떻게', sounds:[['h','흐'], ['ow','아우']], read:'흐아우', fast:'하우' },
+    { word:'but', meaning:'그러나', sounds:[['b','브'], ['u','어'], ['t','트']], read:'브어트', fast:'벗' },
+    { word:'or', meaning:'또는', sounds:[['or','오r']], read:'오r', fast:'오어' },
+    { word:'because', meaning:'왜냐하면', sounds:[['be','비'], ['cause','커즈']], read:'비커즈', fast:'비커즈' },
+    { word:'here', meaning:'여기', sounds:[['h','흐'], ['ere','이어']], read:'흐이어', fast:'히어' },
+  ],
+  sw5: [
+    { word:'will', meaning:'~할것이다', sounds:[['w','워'], ['i','이'], ['ll','을']], read:'워이을', fast:'윌' },
+    { word:'would', meaning:'~할것이다', sounds:[['w','워'], ['ould','우드']], read:'워우드', fast:'우드' },
+    { word:'could', meaning:'~할수있었다', sounds:[['c','크'], ['ould','우드']], read:'크우드', fast:'쿠드' },
+    { word:'should', meaning:'~해야한다', sounds:[['sh','쉬'], ['ould','우드']], read:'쉬우드', fast:'슈드' },
+    { word:'after', meaning:'후에', sounds:[['af','애프'], ['ter','터']], read:'애프터', fast:'애프터' },
+    { word:'before', meaning:'전에', sounds:[['be','비'], ['fore','포어']], read:'비포어', fast:'비포어' },
+    { word:'then', meaning:'그때', sounds:[['th','드'], ['e','에'], ['n','은']], read:'드에은', fast:'덴' },
+    { word:'there', meaning:'거기', sounds:[['th','드'], ['ere','에어']], read:'드에어', fast:'데어' },
+    { word:'very', meaning:'매우', sounds:[['v','브'], ['e','에'], ['ry','리']], read:'브에리', fast:'베리' },
+    { word:'really', meaning:'정말로', sounds:[['r','r'], ['ea','이'], ['lly','얼리']], read:'리얼리', fast:'리얼리' },
+  ],
 };
 
 /* =========================================================
@@ -305,6 +377,8 @@ const EMOJI_MAP = {
   boat:'⛵', coat:'🧥', goat:'🐐', road:'🛣️', soap:'🧼',
   snow:'❄️', blow:'💨', tow:'🪝', cow:'🐄', down:'⬇️',
   oil:'🛢️', coin:'🪙', boy:'👦', toy:'🧸', joy:'😄',
+  // Level 5 사이트워드
+  the:'📖', a:'1️⃣', 'I':'👤', is:'🟰', you:'👉', to:'➡️', of:'📌', and:'➕', in:'📥', it:'📦', have:'🤲', do:'⚙️', can:'✅', go:'🚶', see:'👀', want:'🙏', like:'❤️', know:'💡', look:'🔍', come:'⬅️', my:'🙋', your:'👈', he:'👨', she:'👩', we:'👥', they:'👨‍👩‍👧', this:'👇', that:'👉', was:'⏳', said:'💬', what:'❓', when:'⏰', where:'🗺️', who:'🕵️', why:'🤔', how:'🛠️', but:'⚠️', or:'🔀', because:'➡️', here:'📍', will:'🔮', would:'🪄', could:'🌟', should:'🎯', after:'⏭️', before:'⏮️', then:'👉', there:'📌', very:'💯', really:'❗',
 };
 
 /* =========================================================
@@ -1632,6 +1706,258 @@ const ILLUS = {
     <circle cx="44" cy="74" r="4" fill="#FB7185" opacity=".6"/>
     <circle cx="76" cy="74" r="4" fill="#FB7185" opacity=".6"/>
   </Frame>,
+  /* ───── Level 5: 사이트워드 (텍스트 카드) ───── */
+  the: <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">the</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">그/관사</text>
+  </Frame>,
+  a: <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">a</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">하나의</text>
+  </Frame>,
+  'I': <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">I</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">나</text>
+  </Frame>,
+  is: <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">is</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">~이다</text>
+  </Frame>,
+  you: <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">you</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">너</text>
+  </Frame>,
+  to: <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">to</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">~에</text>
+  </Frame>,
+  of: <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">of</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">~의</text>
+  </Frame>,
+  and: <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">and</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">그리고</text>
+  </Frame>,
+  in: <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">in</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">~안에</text>
+  </Frame>,
+  it: <Frame bg="#ECFEFF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0E7490"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">it</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">그것</text>
+  </Frame>,
+  have: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">have</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">가지다</text>
+  </Frame>,
+  do: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">do</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">하다</text>
+  </Frame>,
+  can: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">can</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">할수있다</text>
+  </Frame>,
+  go: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">go</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">가다</text>
+  </Frame>,
+  see: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">see</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">보다</text>
+  </Frame>,
+  want: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">want</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">원하다</text>
+  </Frame>,
+  like: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">like</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">좋아하다</text>
+  </Frame>,
+  know: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">know</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">알다</text>
+  </Frame>,
+  look: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">look</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">보다</text>
+  </Frame>,
+  come: <Frame bg="#CFFAFE">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#0891B2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">come</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">오다</text>
+  </Frame>,
+  my: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">my</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">나의</text>
+  </Frame>,
+  your: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">your</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">너의</text>
+  </Frame>,
+  he: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">he</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">그(남)</text>
+  </Frame>,
+  she: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">she</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">그녀</text>
+  </Frame>,
+  we: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">we</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">우리</text>
+  </Frame>,
+  they: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">they</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">그들</text>
+  </Frame>,
+  this: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">this</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">이것</text>
+  </Frame>,
+  that: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">that</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">저것</text>
+  </Frame>,
+  was: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">was</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">였다</text>
+  </Frame>,
+  said: <Frame bg="#F5F3FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#7C3AED"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">said</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">말했다</text>
+  </Frame>,
+  what: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">what</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">무엇</text>
+  </Frame>,
+  when: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">when</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">언제</text>
+  </Frame>,
+  where: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">where</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">어디</text>
+  </Frame>,
+  who: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">who</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">누구</text>
+  </Frame>,
+  why: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">why</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">왜</text>
+  </Frame>,
+  how: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">how</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">어떻게</text>
+  </Frame>,
+  but: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">but</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">그러나</text>
+  </Frame>,
+  or: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">or</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">또는</text>
+  </Frame>,
+  because: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="18" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">because</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">왜냐하면</text>
+  </Frame>,
+  here: <Frame bg="#FAE8FF">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#9333EA"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">here</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">여기</text>
+  </Frame>,
+  will: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">will</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">~할것이다</text>
+  </Frame>,
+  would: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">would</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">~할것이다</text>
+  </Frame>,
+  could: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">could</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="9" fontWeight="700" fill="#1F2937">~할수있었다</text>
+  </Frame>,
+  should: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="18" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">should</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">~해야한다</text>
+  </Frame>,
+  after: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">after</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">후에</text>
+  </Frame>,
+  before: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="18" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">before</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">전에</text>
+  </Frame>,
+  then: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">then</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">그때</text>
+  </Frame>,
+  there: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">there</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">거기</text>
+  </Frame>,
+  very: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="22" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">very</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">매우</text>
+  </Frame>,
+  really: <Frame bg="#FCE7F3">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#BE185D"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="18" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">really</text>
+    <text x="60" y="100" textAnchor="middle" fontSize="11" fontWeight="700" fill="#1F2937">정말로</text>
+  </Frame>,
+
 };
 
 /* =========================================================
