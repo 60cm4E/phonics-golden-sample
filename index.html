@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>진짜 쉬운 파닉스 · 단모음 학습 v2</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  body { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif; }
+  .word-en { font-family: 'Fredoka', 'Nunito', 'Segoe UI', sans-serif; letter-spacing: 0.02em; }
+  @keyframes pop { 0%{transform:scale(.85);opacity:0} 100%{transform:scale(1);opacity:1} }
+  .pop-in { animation: pop .22s ease-out both; }
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(255,122,69,.6); }
+    100% { box-shadow: 0 0 0 18px rgba(255,122,69,0); }
+  }
+  .pulse-ring { animation: pulse-ring 1.2s infinite; }
+  .no-select { user-select: none; }
+</style>
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen">
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+/* =========================================================
+   1) 단계 정의
+   ========================================================= */
+const STAGES = [
+  // ─── Level 1: 단모음 ───
+  { key:'a', level:1, label:'단모음 a', sound:'애', color:'#FF7A45',
+    mouth:'입을 아래위로 살짝 벌려서 /애/ 소리를 내요.' },
+  { key:'e', level:1, label:'단모음 e', sound:'에', color:'#F59E0B',
+    mouth:'입을 양옆으로 살짝 벌리며 /에/ 소리를 내요.' },
+  { key:'i', level:1, label:'단모음 i', sound:'이', color:'#16A34A',
+    mouth:'입을 양옆으로 더 크게 벌리며 /이/ 소리를 내요.' },
+  { key:'o', level:1, label:'단모음 o', sound:'아', color:'#2563EB',
+    mouth:'한글 /아/ 보다 입을 작게 둥글게 벌려요.' },
+  { key:'u', level:1, label:'단모음 u', sound:'어', color:'#9333EA',
+    mouth:'입을 살짝 벌려 가운데에서 /어/ 소리를 내요.' },
+  // ─── Level 2: 매직 e (장모음) ───
+  { key:'a_e', level:2, label:'매직 e: a_e', sound:'에이', color:'#EF4444',
+    mouth:'마지막 e가 침묵하고, 앞의 a가 자기 이름 /에이/ 소리를 내요.' },
+  { key:'e_e', level:2, label:'매직 e: e_e', sound:'이', color:'#D97706',
+    mouth:'마지막 e가 침묵하고, 앞의 e가 자기 이름 /이/ 소리를 내요.' },
+  { key:'i_e', level:2, label:'매직 e: i_e', sound:'아이', color:'#059669',
+    mouth:'마지막 e가 침묵하고, 앞의 i가 자기 이름 /아이/ 소리를 내요.' },
+  { key:'o_e', level:2, label:'매직 e: o_e', sound:'오우', color:'#0284C7',
+    mouth:'마지막 e가 침묵하고, 앞의 o가 자기 이름 /오우/ 소리를 내요.' },
+  { key:'u_e', level:2, label:'매직 e: u_e', sound:'유', color:'#7E22CE',
+    mouth:'마지막 e가 침묵하고, 앞의 u가 자기 이름 /유/ 소리를 내요.' },
+  // ─── Level 3: 이중자음 / 함체자음 ───
+  { key:'sh', level:3, label:'이중자음 sh', sound:'쉬', color:'#0E7490',
+    mouth:'s와 h가 만나면 /쉬/ 소리. 입술을 살짝 내밀고 조용히 쉬-' },
+  { key:'ch', level:3, label:'이중자음 ch', sound:'취', color:'#0D9488',
+    mouth:'c와 h가 만나면 /취/ 소리. 혀 앞쪽으로 짧고 빠르게.' },
+  { key:'th', level:3, label:'이중자음 th', sound:'쓰/드', color:'#15803D',
+    mouth:'혀끝을 윗니 아래에 살짝 대고 /쓰/ 또는 /드/.' },
+  { key:'ph', level:3, label:'이중자음 ph', sound:'프', color:'#65A30D',
+    mouth:'p와 h가 만나면 f처럼 /프/. 아랫입술을 윗니로 가볍게.' },
+  { key:'wh', level:3, label:'이중자음 wh', sound:'워', color:'#CA8A04',
+    mouth:'대부분 /워/ 소리. h는 보통 침묵해요.' },
+  { key:'ng', level:3, label:'함체자음 ng', sound:'응', color:'#B45309',
+    mouth:'단어 끝에서 콧소리 /응/. 입술이 닫히지 않아요.' },
+  // ─── Level 4: 이중모음 (대장모음 · 합체모음) ───
+  { key:'ai_ay', level:4, label:'이중모음 ai/ay', sound:'에이', color:'#DC2626',
+    mouth:'ai와 ay 모두 /에이/ 소리. ai는 단어 가운데, ay는 단어 끝.' },
+  { key:'ee', level:4, label:'이중모음 ee', sound:'이-', color:'#EA580C',
+    mouth:'길고 또렷한 /이-/ 소리. 입을 양옆으로 벌려요.' },
+  { key:'ea', level:4, label:'이중모음 ea', sound:'이-', color:'#CA8A04',
+    mouth:'대부분 길고 또렷한 /이-/ 소리. 일부 예외(bread)는 /에/.' },
+  { key:'oa', level:4, label:'이중모음 oa', sound:'오우', color:'#16A34A',
+    mouth:'/오우/ 소리. o가 자기 이름을 말하고 a는 침묵.' },
+  { key:'ow', level:4, label:'이중모음 ow', sound:'오우/아우', color:'#0EA5E9',
+    mouth:'두 가지 소리. /오우/(snow) 또는 /아우/(cow).' },
+  { key:'oi_oy', level:4, label:'이중모음 oi/oy', sound:'오이', color:'#7C3AED',
+    mouth:'oi와 oy 모두 /오이/ 소리. oy는 주로 단어 끝.' },
+];
+
+/* =========================================================
+   2) 단어 데이터 (단모음당 10단어 = 총 50)
+      ※ 새 단어 추가는 이 객체에 한 줄만 추가하면 됩니다.
+   ========================================================= */
+const WORDS = {
+  a: [
+    { word:'ham', meaning:'햄',       sounds:[['h','흐'],['a','애'],['m','음']], read:'흐애음', fast:'햄' },
+    { word:'ram', meaning:'숫양',     sounds:[['r','뤄'],['a','애'],['m','음']], read:'뤄애음', fast:'뤰' },
+    { word:'cap', meaning:'야구모자', sounds:[['c','크'],['a','애'],['p','프']], read:'크애프', fast:'캐프' },
+    { word:'can', meaning:'캔',       sounds:[['c','크'],['a','애'],['n','은']], read:'크애은', fast:'캔' },
+    { word:'hat', meaning:'모자',     sounds:[['h','흐'],['a','애'],['t','트']], read:'흐애트', fast:'해트' },
+    { word:'cat', meaning:'고양이',   sounds:[['c','크'],['a','애'],['t','트']], read:'크애트', fast:'캐트' },
+    { word:'bat', meaning:'야구방망이', sounds:[['b','브'],['a','애'],['t','트']], read:'브애트', fast:'배트' },
+    { word:'mat', meaning:'매트',     sounds:[['m','므'],['a','애'],['t','트']], read:'므애트', fast:'매트' },
+    { word:'fan', meaning:'선풍기',   sounds:[['f','프'],['a','애'],['n','은']], read:'프애은', fast:'팬' },
+    { word:'jam', meaning:'잼',       sounds:[['j','즈'],['a','애'],['m','음']], read:'즈애음', fast:'잼' },
+  ],
+  e: [
+    { word:'bed', meaning:'침대',   sounds:[['b','브'],['e','에'],['d','드']], read:'브에드', fast:'베드' },
+    { word:'red', meaning:'빨강',   sounds:[['r','뤄'],['e','에'],['d','드']], read:'뤄에드', fast:'뤤드' },
+    { word:'pen', meaning:'펜',     sounds:[['p','프'],['e','에'],['n','은']], read:'프에은', fast:'펜' },
+    { word:'hen', meaning:'암탉',   sounds:[['h','흐'],['e','에'],['n','은']], read:'흐에은', fast:'헨' },
+    { word:'jet', meaning:'제트기', sounds:[['j','즈'],['e','에'],['t','트']], read:'즈에트', fast:'제트' },
+    { word:'net', meaning:'그물',   sounds:[['n','느'],['e','에'],['t','트']], read:'느에트', fast:'네트' },
+    { word:'vet', meaning:'수의사', sounds:[['v','브'],['e','에'],['t','트']], read:'브에트', fast:'베트' },
+    { word:'leg', meaning:'다리',   sounds:[['l','르'],['e','에'],['g','그']], read:'르에그', fast:'레그' },
+    { word:'web', meaning:'거미줄', sounds:[['w','워'],['e','에'],['b','브']], read:'워에브', fast:'웹' },
+    { word:'ten', meaning:'열(10)', sounds:[['t','트'],['e','에'],['n','은']], read:'트에은', fast:'텐' },
+  ],
+  i: [
+    { word:'bib', meaning:'턱받이', sounds:[['b','브'],['i','이'],['b','브']], read:'브이브', fast:'비브' },
+    { word:'hid', meaning:'숨었다', sounds:[['h','흐'],['i','이'],['d','드']], read:'흐이드', fast:'히드' },
+    { word:'pig', meaning:'돼지',   sounds:[['p','프'],['i','이'],['g','그']], read:'프이그', fast:'피그' },
+    { word:'win', meaning:'이기다', sounds:[['w','워'],['i','이'],['n','은']], read:'워이은', fast:'윈' },
+    { word:'rip', meaning:'찢다',   sounds:[['r','뤄'],['i','이'],['p','프']], read:'뤄이프', fast:'뤼프' },
+    { word:'kid', meaning:'아이',   sounds:[['k','크'],['i','이'],['d','드']], read:'크이드', fast:'키드' },
+    { word:'lip', meaning:'입술',   sounds:[['l','르'],['i','이'],['p','프']], read:'르이프', fast:'립' },
+    { word:'fin', meaning:'지느러미', sounds:[['f','프'],['i','이'],['n','은']], read:'프이은', fast:'핀' },
+    { word:'six', meaning:'여섯(6)', sounds:[['s','쓰'],['i','이'],['x','크쓰']], read:'쓰이크쓰', fast:'식쓰' },
+    { word:'mix', meaning:'섞다',   sounds:[['m','므'],['i','이'],['x','크쓰']], read:'므이크쓰', fast:'믹쓰' },
+  ],
+  o: [
+    { word:'hop', meaning:'깡충 뛰다', sounds:[['h','흐'],['o','아'],['p','프']], read:'흐아프', fast:'하프' },
+    { word:'mop', meaning:'대걸레', sounds:[['m','므'],['o','아'],['p','프']], read:'므아프', fast:'마프' },
+    { word:'hot', meaning:'뜨거운', sounds:[['h','흐'],['o','아'],['t','트']], read:'흐아트', fast:'하트' },
+    { word:'not', meaning:'아니다', sounds:[['n','느'],['o','아'],['t','트']], read:'느아트', fast:'나트' },
+    { word:'box', meaning:'상자',   sounds:[['b','브'],['o','아'],['x','크쓰']], read:'브아크쓰', fast:'박쓰' },
+    { word:'dog', meaning:'개',     sounds:[['d','드'],['o','아'],['g','그']], read:'드아그', fast:'도그' },
+    { word:'fox', meaning:'여우',   sounds:[['f','프'],['o','아'],['x','크쓰']], read:'프아크쓰', fast:'팍쓰' },
+    { word:'mom', meaning:'엄마',   sounds:[['m','므'],['o','아'],['m','음']], read:'므아음', fast:'마음' },
+    { word:'pot', meaning:'냄비',   sounds:[['p','프'],['o','아'],['t','트']], read:'프아트', fast:'파트' },
+    { word:'log', meaning:'통나무', sounds:[['l','르'],['o','아'],['g','그']], read:'르아그', fast:'로그' },
+  ],
+  u: [
+    { word:'tub', meaning:'욕조',   sounds:[['t','트'],['u','어'],['b','브']], read:'트어브', fast:'터브' },
+    { word:'hug', meaning:'포옹',   sounds:[['h','흐'],['u','어'],['g','그']], read:'흐어그', fast:'허그' },
+    { word:'sun', meaning:'해',     sounds:[['s','쓰'],['u','어'],['n','은']], read:'쓰어은', fast:'썬' },
+    { word:'cup', meaning:'컵',     sounds:[['c','크'],['u','어'],['p','프']], read:'크어프', fast:'커프' },
+    { word:'mud', meaning:'진흙',   sounds:[['m','므'],['u','어'],['d','드']], read:'므어드', fast:'머드' },
+    { word:'bus', meaning:'버스',   sounds:[['b','브'],['u','어'],['s','스']], read:'브어스', fast:'버스' },
+    { word:'bug', meaning:'벌레',   sounds:[['b','브'],['u','어'],['g','그']], read:'브어그', fast:'버그' },
+    { word:'gum', meaning:'껌',     sounds:[['g','그'],['u','어'],['m','음']], read:'그어음', fast:'검' },
+    { word:'run', meaning:'달리다', sounds:[['r','뤄'],['u','어'],['n','은']], read:'뤄어은', fast:'뤈' },
+    { word:'nut', meaning:'견과',   sounds:[['n','느'],['u','어'],['t','트']], read:'느어트', fast:'너트' },
+  ],
+  // ─── Level 2: 매직 e ───
+  a_e: [
+    { word:'cape', meaning:'망토', sounds:[['c','크'],['a','에이'],['p','프'],['e','매직e']], read:'크에이프', fast:'케이프' },
+    { word:'tape', meaning:'테이프', sounds:[['t','트'],['a','에이'],['p','프'],['e','매직e']], read:'트에이프', fast:'테이프' },
+    { word:'hate', meaning:'싫어하다', sounds:[['h','흐'],['a','에이'],['t','트'],['e','매직e']], read:'흐에이트', fast:'헤이트' },
+    { word:'cane', meaning:'지팡이', sounds:[['c','크'],['a','에이'],['n','은'],['e','매직e']], read:'크에이은', fast:'케인' },
+    { word:'mane', meaning:'갈기', sounds:[['m','므'],['a','에이'],['n','은'],['e','매직e']], read:'므에이은', fast:'메인' },
+  ],
+  e_e: [
+    { word:'eve', meaning:'전날 밤', sounds:[['e','이'],['v','브'],['e','매직e']], read:'이브', fast:'이브' },
+    { word:'Pete', meaning:'피트(이름)', sounds:[['P','프'],['e','이'],['t','트'],['e','매직e']], read:'프이트', fast:'피트' },
+    { word:'Steve', meaning:'스티브(이름)', sounds:[['St','스트'],['e','이'],['v','브'],['e','매직e']], read:'스트이브', fast:'스티브' },
+    { word:'compete', meaning:'경쟁하다', sounds:[['comp','컴프'],['e','이'],['t','트'],['e','매직e']], read:'컴프이트', fast:'컴피트' },
+  ],
+  i_e: [
+    { word:'bike', meaning:'자전거', sounds:[['b','브'],['i','아이'],['k','크'],['e','매직e']], read:'브아이크', fast:'바이크' },
+    { word:'ride', meaning:'타다', sounds:[['r','뤄'],['i','아이'],['d','드'],['e','매직e']], read:'뤄아이드', fast:'롸이드' },
+    { word:'hide', meaning:'숨다', sounds:[['h','흐'],['i','아이'],['d','드'],['e','매직e']], read:'흐아이드', fast:'하이드' },
+    { word:'pine', meaning:'소나무', sounds:[['p','프'],['i','아이'],['n','은'],['e','매직e']], read:'프아이은', fast:'파인' },
+    { word:'wine', meaning:'와인', sounds:[['w','워'],['i','아이'],['n','은'],['e','매직e']], read:'워아이은', fast:'와인' },
+  ],
+  o_e: [
+    { word:'bone', meaning:'뼈', sounds:[['b','브'],['o','오우'],['n','은'],['e','매직e']], read:'브오우은', fast:'본' },
+    { word:'home', meaning:'집', sounds:[['h','흐'],['o','오우'],['m','음'],['e','매직e']], read:'흐오우음', fast:'홈' },
+    { word:'rose', meaning:'장미', sounds:[['r','뤄'],['o','오우'],['s','즈'],['e','매직e']], read:'뤄오우즈', fast:'로즈' },
+    { word:'nose', meaning:'코', sounds:[['n','느'],['o','오우'],['s','즈'],['e','매직e']], read:'느오우즈', fast:'노즈' },
+    { word:'cone', meaning:'원뿔', sounds:[['c','크'],['o','오우'],['n','은'],['e','매직e']], read:'크오우은', fast:'콘' },
+  ],
+  u_e: [
+    { word:'tube', meaning:'튜브', sounds:[['t','트'],['u','유'],['b','브'],['e','매직e']], read:'트유브', fast:'튜브' },
+    { word:'cute', meaning:'귀여운', sounds:[['c','크'],['u','유'],['t','트'],['e','매직e']], read:'크유트', fast:'큐트' },
+    { word:'mute', meaning:'무음', sounds:[['m','므'],['u','유'],['t','트'],['e','매직e']], read:'므유트', fast:'뮤트' },
+    { word:'June', meaning:'6월', sounds:[['J','즈'],['u','유'],['n','은'],['e','매직e']], read:'즈유은', fast:'준' },
+    { word:'cube', meaning:'정육면체', sounds:[['c','크'],['u','유'],['b','브'],['e','매직e']], read:'크유브', fast:'큐브' },
+  ],
+  // ─── Level 3: 이중자음 ───
+  sh: [
+    { word:'shell', meaning:'조개껍데기', sounds:[['sh','쉬'],['e','에'],['ll','을']], read:'쉬에을', fast:'쉘' },
+    { word:'shed', meaning:'헛간', sounds:[['sh','쉬'],['e','에'],['d','드']], read:'쉬에드', fast:'쉐드' },
+    { word:'ship', meaning:'배', sounds:[['sh','쉬'],['i','이'],['p','프']], read:'쉬이프', fast:'쉽' },
+    { word:'shop', meaning:'가게', sounds:[['sh','쉬'],['o','아'],['p','프']], read:'쉬아프', fast:'샵' },
+    { word:'fish', meaning:'물고기', sounds:[['f','프'],['i','이'],['sh','쉬']], read:'프이쉬', fast:'피쉬' },
+  ],
+  ch: [
+    { word:'chick', meaning:'병아리', sounds:[['ch','취'],['i','이'],['ck','크']], read:'취이크', fast:'칙' },
+    { word:'chair', meaning:'의자', sounds:[['ch','취'],['air','에어']], read:'취에어', fast:'체어' },
+    { word:'chin', meaning:'턱', sounds:[['ch','취'],['i','이'],['n','은']], read:'취이은', fast:'친' },
+    { word:'chop', meaning:'썰다', sounds:[['ch','취'],['o','아'],['p','프']], read:'취아프', fast:'챱' },
+    { word:'much', meaning:'많이', sounds:[['m','므'],['u','어'],['ch','취']], read:'므어취', fast:'머취' },
+  ],
+  th: [
+    { word:'thumb', meaning:'엄지', sounds:[['th','쓰'],['u','어'],['m','음']], read:'쓰어음', fast:'썸' },
+    { word:'three', meaning:'셋(3)', sounds:[['th','쓰'],['r','뤄'],['ee','이-']], read:'쓰뤄이', fast:'쓰리' },
+    { word:'thin', meaning:'얇은', sounds:[['th','쓰'],['i','이'],['n','은']], read:'쓰이은', fast:'씬' },
+    { word:'bath', meaning:'목욕', sounds:[['b','브'],['a','애'],['th','쓰']], read:'브애쓰', fast:'배쓰' },
+    { word:'math', meaning:'수학', sounds:[['m','므'],['a','애'],['th','쓰']], read:'므애쓰', fast:'매쓰' },
+  ],
+  ph: [
+    { word:'phone', meaning:'전화', sounds:[['ph','프'],['o','오우'],['n','은'],['e','매직e']], read:'프오우은', fast:'폰' },
+    { word:'photo', meaning:'사진', sounds:[['ph','프'],['o','오우'],['t','트'],['o','오']], read:'프오우트오', fast:'포토' },
+    { word:'graph', meaning:'그래프', sounds:[['gr','그뤄'],['a','애'],['ph','프']], read:'그뤄애프', fast:'그래프' },
+    { word:'dolphin', meaning:'돌고래', sounds:[['dol','달'],['ph','프'],['in','인']], read:'달프인', fast:'달핀' },
+    { word:'elephant', meaning:'코끼리', sounds:[['ele','엘리'],['ph','프'],['ant','언트']], read:'엘리프언트', fast:'엘러펀트' },
+  ],
+  wh: [
+    { word:'whip', meaning:'채찍', sounds:[['wh','워'],['i','이'],['p','프']], read:'워이프', fast:'윕' },
+    { word:'whale', meaning:'고래', sounds:[['wh','워'],['a','에이'],['l','을'],['e','매직e']], read:'워에이을', fast:'웨일' },
+    { word:'white', meaning:'흰색', sounds:[['wh','워'],['i','아이'],['t','트'],['e','매직e']], read:'워아이트', fast:'와이트' },
+    { word:'when', meaning:'언제', sounds:[['wh','워'],['e','에'],['n','은']], read:'워에은', fast:'웬' },
+    { word:'wheel', meaning:'바퀴', sounds:[['wh','워'],['ee','이-'],['l','을']], read:'워이을', fast:'윌' },
+  ],
+  ng: [
+    { word:'hang', meaning:'걸다', sounds:[['h','흐'],['a','애'],['ng','응']], read:'흐애응', fast:'행' },
+    { word:'sing', meaning:'노래하다', sounds:[['s','쓰'],['i','이'],['ng','응']], read:'쓰이응', fast:'씽' },
+    { word:'king', meaning:'왕', sounds:[['k','크'],['i','이'],['ng','응']], read:'크이응', fast:'킹' },
+    { word:'long', meaning:'긴', sounds:[['l','르'],['o','아'],['ng','응']], read:'르아응', fast:'롱' },
+    { word:'spring', meaning:'봄/용수철', sounds:[['spr','스프뤄'],['i','이'],['ng','응']], read:'스프뤄이응', fast:'스프링' },
+  ],
+  // ─── Level 4: 이중모음 ───
+  ai_ay: [
+    { word:'mail', meaning:'우편', sounds:[['m','므'],['ai','에이'],['l','을']], read:'므에이을', fast:'메일' },
+    { word:'nail', meaning:'못/손톱', sounds:[['n','느'],['ai','에이'],['l','을']], read:'느에이을', fast:'네일' },
+    { word:'rain', meaning:'비', sounds:[['r','뤄'],['ai','에이'],['n','은']], read:'뤄에이은', fast:'레인' },
+    { word:'say', meaning:'말하다', sounds:[['s','쓰'],['ay','에이']], read:'쓰에이', fast:'쎄이' },
+    { word:'play', meaning:'놀다', sounds:[['pl','플'],['ay','에이']], read:'플에이', fast:'플레이' },
+  ],
+  ee: [
+    { word:'bee', meaning:'벌', sounds:[['b','브'],['ee','이-']], read:'브이', fast:'비' },
+    { word:'tree', meaning:'나무', sounds:[['tr','트뤄'],['ee','이-']], read:'트뤄이', fast:'트리' },
+    { word:'see', meaning:'보다', sounds:[['s','쓰'],['ee','이-']], read:'쓰이', fast:'씨' },
+    { word:'knee', meaning:'무릎', sounds:[['kn','느'],['ee','이-']], read:'느이', fast:'니' },
+    { word:'feet', meaning:'발(복수)', sounds:[['f','프'],['ee','이-'],['t','트']], read:'프이트', fast:'피트' },
+  ],
+  ea: [
+    { word:'sea', meaning:'바다', sounds:[['s','쓰'],['ea','이-']], read:'쓰이', fast:'씨' },
+    { word:'tea', meaning:'차', sounds:[['t','트'],['ea','이-']], read:'트이', fast:'티' },
+    { word:'meat', meaning:'고기', sounds:[['m','므'],['ea','이-'],['t','트']], read:'므이트', fast:'미트' },
+    { word:'beach', meaning:'해변', sounds:[['b','브'],['ea','이-'],['ch','취']], read:'브이취', fast:'비취' },
+    { word:'read', meaning:'읽다', sounds:[['r','뤄'],['ea','이-'],['d','드']], read:'뤄이드', fast:'리드' },
+  ],
+  oa: [
+    { word:'boat', meaning:'배', sounds:[['b','브'],['oa','오우'],['t','트']], read:'브오우트', fast:'보트' },
+    { word:'coat', meaning:'코트', sounds:[['c','크'],['oa','오우'],['t','트']], read:'크오우트', fast:'코트' },
+    { word:'goat', meaning:'염소', sounds:[['g','그'],['oa','오우'],['t','트']], read:'그오우트', fast:'고트' },
+    { word:'road', meaning:'길', sounds:[['r','뤄'],['oa','오우'],['d','드']], read:'뤄오우드', fast:'로드' },
+    { word:'soap', meaning:'비누', sounds:[['s','쓰'],['oa','오우'],['p','프']], read:'쓰오우프', fast:'소프' },
+  ],
+  ow: [
+    { word:'snow', meaning:'눈', sounds:[['sn','스느'],['ow','오우']], read:'스느오우', fast:'스노' },
+    { word:'blow', meaning:'불다', sounds:[['bl','블'],['ow','오우']], read:'블오우', fast:'블로' },
+    { word:'tow', meaning:'끌다', sounds:[['t','트'],['ow','오우']], read:'트오우', fast:'토' },
+    { word:'cow', meaning:'소', sounds:[['c','크'],['ow','아우']], read:'크아우', fast:'카우' },
+    { word:'down', meaning:'아래', sounds:[['d','드'],['ow','아우'],['n','은']], read:'드아우은', fast:'다운' },
+  ],
+  oi_oy: [
+    { word:'oil', meaning:'기름', sounds:[['oi','오이'],['l','을']], read:'오이을', fast:'오일' },
+    { word:'coin', meaning:'동전', sounds:[['c','크'],['oi','오이'],['n','은']], read:'크오이은', fast:'코인' },
+    { word:'boy', meaning:'소년', sounds:[['b','브'],['oy','오이']], read:'브오이', fast:'보이' },
+    { word:'toy', meaning:'장난감', sounds:[['t','트'],['oy','오이']], read:'트오이', fast:'토이' },
+    { word:'joy', meaning:'기쁨', sounds:[['j','즈'],['oy','오이']], read:'즈오이', fast:'조이' },
+  ],
+};
+
+/* =========================================================
+   3) 이모지 폴백 매핑
+      ※ 자체 SVG가 없는 단어는 자동으로 이모지로 표시.
+      ※ 새 단어 추가 시 ILLUS에 없으면 EMOJI_MAP에 이모지 한 글자만 추가하세요.
+   ========================================================= */
+const EMOJI_MAP = {
+  ham:'🍖', ram:'🐏', cap:'🧢', can:'🥫', hat:'🎩',
+  cat:'🐱', bat:'🏏', mat:'🟦', fan:'🌀', jam:'🍓',
+  bed:'🛏️', red:'🟥', pen:'🖊️', hen:'🐔', jet:'✈️',
+  net:'🕸️', vet:'🩺', leg:'🦵', web:'🕷️', ten:'🔟',
+  bib:'👶', hid:'🌳', pig:'🐷', win:'🏆', rip:'📄',
+  kid:'🧒', lip:'👄', fin:'🐟', six:'6️⃣', mix:'🥣',
+  hop:'🐰', mop:'🧹', hot:'🔥', not:'🚫', box:'📦',
+  dog:'🐶', fox:'🦊', mom:'👩', pot:'🍲', log:'🪵',
+  tub:'🛁', hug:'🤗', sun:'☀️', cup:'☕', mud:'🟫',
+  bus:'🚌', bug:'🐞', gum:'🍬', run:'🏃', nut:'🌰',
+  // Level 2 매직 e
+  cape:'🦸', tape:'📼', hate:'😠', cane:'🦯', mane:'🦁',
+  eve:'🌃', Pete:'👦', Steve:'👨', compete:'🏃',
+  bike:'🚲', ride:'🚴', hide:'🙈', pine:'🌲', wine:'🍷',
+  bone:'🦴', home:'🏠', rose:'🌹', nose:'👃', cone:'🍦',
+  tube:'🧪', cute:'🥰', mute:'🔇', June:'📅', cube:'🧊',
+  // Level 3 이중자음
+  shell:'🐚', shed:'🏚️', ship:'🚢', shop:'🏪', fish:'🐟',
+  chick:'🐤', chair:'🪑', chin:'😶', chop:'🔪', much:'💯',
+  thumb:'👍', three:'3️⃣', thin:'📏', bath:'🛁', math:'➗',
+  phone:'📞', photo:'📷', graph:'📊', dolphin:'🐬', elephant:'🐘',
+  whip:'➰', whale:'🐳', white:'⬜', when:'⏰', wheel:'🛞',
+  hang:'🪝', sing:'🎤', king:'🤴', long:'📏', spring:'🌸',
+  // Level 4 이중모음
+  mail:'✉️', nail:'🔨', rain:'🌧️', say:'💬', play:'🎮',
+  bee:'🐝', tree:'🌳', see:'👀', knee:'🦵', feet:'🦶',
+  sea:'🌊', tea:'🍵', meat:'🥩', beach:'🏖️', read:'📖',
+  boat:'⛵', coat:'🧥', goat:'🐐', road:'🛣️', soap:'🧼',
+  snow:'❄️', blow:'💨', tow:'🪝', cow:'🐄', down:'⬇️',
+  oil:'🛢️', coin:'🪙', boy:'👦', toy:'🧸', joy:'😄',
+};
+
+/* =========================================================
+   4) 자체 SVG 일러스트 (수정 + 신규)
+      ※ 새 단어 일러스트는 ILLUS 객체에 한 줄 추가하면 됩니다.
+      ※ 추가하지 않으면 위 EMOJI_MAP의 이모지가 자동 표시됩니다.
+   ========================================================= */
+const Frame = ({children, bg='#FFF7ED'}) => (
+  <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+    <rect width="120" height="120" rx="18" fill={bg}/>
+    {children}
+  </svg>
+);
+
+const ILLUS = {
+  /* ───── 단모음 a ───── */
+  ham: <Frame bg="#FFE9E3">
+    <path d="M24 60 Q24 30 60 30 Q96 30 96 60 Q96 90 60 90 Q24 90 24 60 Z" fill="#EB6F5B" stroke="#7C2D12" strokeWidth="3"/>
+    <path d="M38 60 Q38 44 60 44 Q82 44 82 60 Q82 76 60 76 Q38 76 38 60 Z" fill="#FBD4C9" stroke="#7C2D12" strokeWidth="2"/>
+    <circle cx="56" cy="60" r="3" fill="#FFFFFF"/>
+    <circle cx="68" cy="58" r="2" fill="#FFFFFF"/>
+    <circle cx="60" cy="68" r="2" fill="#FFFFFF"/>
+    <path d="M22 60 L12 56 L12 64 Z" fill="#7C2D12"/>
+    <path d="M22 60 L18 58 L18 62 Z" fill="#FBD4C9"/>
+  </Frame>,
+  ram: <Frame bg="#F4ECE2">
+    <path d="M30 50 Q14 46 18 70 Q24 84 40 72" fill="#D2B48C" stroke="#8B4513" strokeWidth="2"/>
+    <path d="M90 50 Q106 46 102 70 Q96 84 80 72" fill="#D2B48C" stroke="#8B4513" strokeWidth="2"/>
+    <ellipse cx="60" cy="76" rx="28" ry="22" fill="#FFFCF6"/>
+    <ellipse cx="60" cy="62" rx="22" ry="20" fill="#FAF3E8"/>
+    <circle cx="52" cy="62" r="2.5" fill="#1F2937"/>
+    <circle cx="68" cy="62" r="2.5" fill="#1F2937"/>
+    <ellipse cx="60" cy="70" rx="6" ry="4" fill="#E5C9A5"/>
+    <path d="M56 72 Q60 76 64 72" fill="none" stroke="#1F2937" strokeWidth="1.6" strokeLinecap="round"/>
+  </Frame>,
+  cap: <Frame bg="#E8F1FB">
+    <path d="M22 78 Q22 50 60 50 Q98 50 98 78 Z" fill="#3B82F6"/>
+    <path d="M22 78 L102 78 Q108 84 98 88 L22 88 Z" fill="#1E40AF"/>
+    <circle cx="60" cy="56" r="4" fill="#FBBF24"/>
+  </Frame>,
+  can: <Frame bg="#FEF4F4">
+    <rect x="38" y="32" width="44" height="60" rx="6" fill="#E11D48"/>
+    <rect x="38" y="40" width="44" height="10" fill="#FFFFFF" opacity=".15"/>
+    <rect x="42" y="56" width="36" height="22" fill="#FFFFFF"/>
+    <text x="60" y="72" textAnchor="middle" fontSize="10" fontWeight="700" fill="#E11D48">COLA</text>
+    <ellipse cx="60" cy="32" rx="22" ry="4" fill="#9F1239"/>
+  </Frame>,
+  hat: <Frame bg="#F5F0E6">
+    <ellipse cx="60" cy="86" rx="44" ry="6" fill="#8B5E3C"/>
+    <path d="M30 82 Q30 50 60 50 Q90 50 90 82 Z" fill="#6B4226"/>
+    <rect x="30" y="78" width="60" height="6" fill="#3F2A1A"/>
+  </Frame>,
+  cat: <Frame bg="#FFF4E0">
+    <circle cx="60" cy="64" r="30" fill="#FBBF24"/>
+    <polygon points="36,42 30,22 50,38" fill="#FBBF24"/>
+    <polygon points="84,42 90,22 70,38" fill="#FBBF24"/>
+    <polygon points="40,30 38,24 46,32" fill="#FCA5A5"/>
+    <polygon points="80,30 82,24 74,32" fill="#FCA5A5"/>
+    <ellipse cx="50" cy="62" rx="3" ry="4" fill="#1F2937"/>
+    <ellipse cx="70" cy="62" rx="3" ry="4" fill="#1F2937"/>
+    <polygon points="56,72 64,72 60,78" fill="#7C2D12"/>
+    <path d="M54 80 Q60 84 66 80" stroke="#7C2D12" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+    <line x1="36" y1="68" x2="48" y2="70" stroke="#1F2937" strokeWidth="1"/>
+    <line x1="36" y1="74" x2="48" y2="74" stroke="#1F2937" strokeWidth="1"/>
+    <line x1="84" y1="68" x2="72" y2="70" stroke="#1F2937" strokeWidth="1"/>
+    <line x1="84" y1="74" x2="72" y2="74" stroke="#1F2937" strokeWidth="1"/>
+  </Frame>,
+  bat: <Frame bg="#FFF7ED">
+    <g transform="rotate(35 60 60)">
+      <path d="M44 12 Q44 6 50 6 L70 6 Q76 6 76 12 L74 60 Q72 72 60 72 Q48 72 46 60 Z" fill="#B45309" stroke="#5D4037" strokeWidth="2"/>
+      <rect x="50" y="72" width="20" height="34" rx="5" fill="#5D4037"/>
+      <rect x="50" y="84" width="20" height="3" fill="#FBBF24"/>
+      <rect x="50" y="92" width="20" height="3" fill="#FBBF24"/>
+      <line x1="58" y1="20" x2="58" y2="60" stroke="#92400E" strokeWidth="1" opacity=".5"/>
+    </g>
+  </Frame>,
+  mat: <Frame bg="#E0F2FE">
+    <rect x="18" y="44" width="84" height="42" rx="6" fill="#10B981"/>
+    <rect x="22" y="48" width="76" height="34" rx="3" fill="#34D399"/>
+    <line x1="32" y1="48" x2="32" y2="82" stroke="#059669" strokeWidth="1"/>
+    <line x1="44" y1="48" x2="44" y2="82" stroke="#059669" strokeWidth="1"/>
+    <line x1="56" y1="48" x2="56" y2="82" stroke="#059669" strokeWidth="1"/>
+    <line x1="68" y1="48" x2="68" y2="82" stroke="#059669" strokeWidth="1"/>
+    <line x1="80" y1="48" x2="80" y2="82" stroke="#059669" strokeWidth="1"/>
+    <line x1="92" y1="48" x2="92" y2="82" stroke="#059669" strokeWidth="1"/>
+  </Frame>,
+  fan: <Frame bg="#EFF6FF">
+    <circle cx="60" cy="54" r="32" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="2"/>
+    <circle cx="60" cy="54" r="6" fill="#475569"/>
+    <path d="M60 54 Q40 30 36 50 Z" fill="#60A5FA"/>
+    <path d="M60 54 Q84 38 86 60 Z" fill="#60A5FA"/>
+    <path d="M60 54 Q50 80 76 78 Z" fill="#60A5FA"/>
+    <rect x="56" y="86" width="8" height="12" fill="#475569"/>
+    <rect x="44" y="98" width="32" height="6" rx="2" fill="#475569"/>
+  </Frame>,
+  jam: <Frame bg="#FCE7F3">
+    <rect x="40" y="42" width="40" height="50" rx="4" fill="#FFFFFF" stroke="#9CA3AF" strokeWidth="1.8"/>
+    <rect x="44" y="50" width="32" height="18" fill="#EC4899"/>
+    <rect x="40" y="38" width="40" height="8" rx="2" fill="#BE185D"/>
+    <rect x="46" y="32" width="28" height="8" rx="2" fill="#9D174D"/>
+    <text x="60" y="80" textAnchor="middle" fontSize="9" fontWeight="700" fill="#9D174D">JAM</text>
+  </Frame>,
+
+  /* ───── 단모음 e ───── */
+  bed: <Frame bg="#EEF2FF">
+    <rect x="22" y="64" width="76" height="20" rx="4" fill="#FFFFFF"/>
+    <rect x="22" y="60" width="32" height="14" rx="3" fill="#A5B4FC"/>
+    <rect x="20" y="82" width="6" height="14" fill="#6366F1"/>
+    <rect x="94" y="82" width="6" height="14" fill="#6366F1"/>
+    <rect x="22" y="56" width="76" height="6" fill="#6366F1"/>
+  </Frame>,
+  red: <Frame bg="#FFF1F2">
+    <path d="M58 32 Q56 24 64 22 Q66 28 62 34 Z" fill="#16A34A"/>
+    <path d="M60 30 Q34 30 30 60 Q28 88 60 96 Q92 88 90 60 Q86 30 60 30 Z" fill="#DC2626"/>
+    <path d="M50 44 Q58 36 72 42" stroke="#FCA5A5" strokeWidth="3" fill="none" strokeLinecap="round"/>
+  </Frame>,
+  pen: <Frame bg="#F0F9FF">
+    <rect x="44" y="20" width="14" height="76" rx="3" fill="#0EA5E9"/>
+    <rect x="44" y="20" width="14" height="14" rx="3" fill="#0369A1"/>
+    <polygon points="44,96 58,96 51,108" fill="#1E3A8A"/>
+    <rect x="58" y="40" width="6" height="20" rx="2" fill="#FBBF24"/>
+  </Frame>,
+  hen: <Frame bg="#FFFBEB">
+    <ellipse cx="60" cy="74" rx="30" ry="20" fill="#FFFFFF"/>
+    <circle cx="42" cy="58" r="14" fill="#FFFFFF"/>
+    <path d="M40 46 Q42 36 50 40 Q44 44 44 50" fill="#DC2626"/>
+    <polygon points="30,58 22,60 30,62" fill="#F59E0B"/>
+    <circle cx="38" cy="56" r="2" fill="#1F2937"/>
+    <path d="M50 64 Q56 62 64 66" stroke="#FBBF24" strokeWidth="2" fill="none"/>
+    <ellipse cx="86" cy="62" rx="6" ry="10" fill="#FFFFFF"/>
+  </Frame>,
+  jet: <Frame bg="#ECFEFF">
+    <path d="M10 60 L70 52 L96 56 L106 60 L96 64 L70 68 L10 60 Z" fill="#0891B2"/>
+    <polygon points="50,52 36,30 50,46" fill="#155E75"/>
+    <polygon points="50,68 36,90 50,74" fill="#155E75"/>
+    <polygon points="86,52 96,40 96,52" fill="#155E75"/>
+    <polygon points="86,68 96,80 96,68" fill="#155E75"/>
+    <circle cx="92" cy="60" r="2.5" fill="#FBBF24"/>
+    <circle cx="84" cy="60" r="2" fill="#FBBF24"/>
+    <path d="M10 60 L0 56 L4 60 L0 64 Z" fill="#67E8F9"/>
+  </Frame>,
+  net: <Frame bg="#F0FDFA">
+    <path d="M30 30 L90 30 L86 90 L34 90 Z" fill="none" stroke="#0D9488" strokeWidth="2.5"/>
+    <line x1="44" y1="30" x2="44" y2="90" stroke="#14B8A6" strokeWidth="2"/>
+    <line x1="60" y1="30" x2="60" y2="90" stroke="#14B8A6" strokeWidth="2"/>
+    <line x1="76" y1="30" x2="76" y2="90" stroke="#14B8A6" strokeWidth="2"/>
+    <line x1="32" y1="44" x2="88" y2="44" stroke="#14B8A6" strokeWidth="2"/>
+    <line x1="32" y1="58" x2="88" y2="58" stroke="#14B8A6" strokeWidth="2"/>
+    <line x1="32" y1="72" x2="88" y2="72" stroke="#14B8A6" strokeWidth="2"/>
+    <line x1="32" y1="86" x2="88" y2="86" stroke="#14B8A6" strokeWidth="2"/>
+  </Frame>,
+  vet: <Frame bg="#FEF2F2">
+    <rect x="40" y="46" width="40" height="50" rx="6" fill="#FFFFFF" stroke="#DC2626" strokeWidth="2"/>
+    <rect x="56" y="54" width="8" height="20" fill="#DC2626"/>
+    <rect x="50" y="60" width="20" height="8" fill="#DC2626"/>
+    <circle cx="60" cy="36" r="14" fill="#FCD9C5"/>
+    <path d="M46 26 Q60 14 74 26 Q72 22 60 22 Q48 22 46 26 Z" fill="#1F2937"/>
+    <circle cx="56" cy="36" r="1.6" fill="#1F2937"/>
+    <circle cx="64" cy="36" r="1.6" fill="#1F2937"/>
+    <path d="M56 80 Q60 84 64 80" stroke="#16A34A" strokeWidth="2" fill="none"/>
+  </Frame>,
+  leg: <Frame bg="#FEF3C7">
+    <path d="M46 12 L74 12 L78 50 L66 50 L60 32 L54 50 L42 50 Z" fill="#3B82F6"/>
+    <rect x="44" y="48" width="32" height="6" fill="#1D4ED8"/>
+    <path d="M46 54 L74 54 L70 82 L50 82 Z" fill="#FCD9C5"/>
+    <path d="M48 82 L72 82 Q90 84 92 94 Q90 102 76 102 L40 102 Q34 96 48 82 Z" fill="#1F2937"/>
+    <path d="M50 92 L86 92" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
+    <path d="M52 96 L84 96" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" opacity=".7"/>
+    <circle cx="60" cy="56" r="2" fill="#E5A48A"/>
+  </Frame>,
+  web: <Frame bg="#F1F5F9">
+    <line x1="60" y1="14" x2="60" y2="106" stroke="#475569" strokeWidth="1.5"/>
+    <line x1="14" y1="60" x2="106" y2="60" stroke="#475569" strokeWidth="1.5"/>
+    <line x1="28" y1="28" x2="92" y2="92" stroke="#475569" strokeWidth="1.5"/>
+    <line x1="92" y1="28" x2="28" y2="92" stroke="#475569" strokeWidth="1.5"/>
+    <path d="M60 30 Q76 36 78 60 Q76 84 60 90 Q44 84 42 60 Q44 36 60 30" fill="none" stroke="#475569" strokeWidth="1.5"/>
+    <path d="M60 42 Q70 46 72 60 Q70 74 60 78 Q50 74 48 60 Q50 46 60 42" fill="none" stroke="#475569" strokeWidth="1.5"/>
+    <circle cx="86" cy="34" r="6" fill="#1F2937"/>
+    <circle cx="84" cy="32" r="1.4" fill="#FFFFFF"/>
+  </Frame>,
+  ten: <Frame bg="#EDE9FE">
+    <rect x="22" y="36" width="76" height="48" rx="8" fill="#7C3AED"/>
+    <text x="60" y="76" textAnchor="middle" fontSize="42" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">10</text>
+  </Frame>,
+
+  /* ───── 단모음 i ───── */
+  bib: <Frame bg="#FFF0F5">
+    <path d="M44 30 L76 30 Q80 30 80 34 Q80 38 76 38 L44 38 Q40 38 40 34 Q40 30 44 30 Z" fill="#F9A8D4"/>
+    <path d="M40 38 Q26 42 30 64 Q34 92 60 96 Q86 92 90 64 Q94 42 80 38 Q60 50 40 38 Z" fill="#F472B6"/>
+    <circle cx="60" cy="62" r="6" fill="#FFFFFF"/>
+    <path d="M50 76 Q60 82 70 76" stroke="#FFFFFF" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+    <ellipse cx="48" cy="58" rx="4" ry="3" fill="#FDE68A" opacity=".9"/>
+    <ellipse cx="72" cy="68" rx="3" ry="2" fill="#FDE68A" opacity=".9"/>
+  </Frame>,
+  hid: <Frame bg="#ECFCCB">
+    <ellipse cx="60" cy="98" rx="44" ry="4" fill="#A3E635"/>
+    <rect x="42" y="50" width="20" height="48" fill="#854D0E"/>
+    <circle cx="52" cy="40" r="28" fill="#65A30D"/>
+    <circle cx="42" cy="32" r="18" fill="#84CC16"/>
+    <circle cx="68" cy="32" r="14" fill="#84CC16"/>
+    <circle cx="78" cy="68" r="10" fill="#FFE4C4"/>
+    <circle cx="76" cy="68" r="1.6" fill="#1F2937"/>
+    <circle cx="82" cy="68" r="1.6" fill="#1F2937"/>
+    <path d="M76 74 Q80 76 82 74" stroke="#1F2937" strokeWidth="1.4" fill="none"/>
+    <path d="M84 60 L84 50 L72 50" fill="none" stroke="#1F2937" strokeWidth="1.2" strokeDasharray="2 2" opacity=".5"/>
+  </Frame>,
+  pig: <Frame bg="#FFE4E6">
+    <circle cx="60" cy="60" r="34" fill="#FBA1B0"/>
+    <ellipse cx="60" cy="72" rx="14" ry="10" fill="#F472B6"/>
+    <circle cx="55" cy="72" r="2" fill="#7C2D4F"/>
+    <circle cx="65" cy="72" r="2" fill="#7C2D4F"/>
+    <circle cx="50" cy="56" r="2.5" fill="#1F2937"/>
+    <circle cx="70" cy="56" r="2.5" fill="#1F2937"/>
+    <path d="M36 36 L44 46 L34 48 Z" fill="#FBA1B0"/>
+    <path d="M84 36 L76 46 L86 48 Z" fill="#FBA1B0"/>
+  </Frame>,
+  win: <Frame bg="#FFFBEB">
+    <path d="M44 26 H76 V46 Q76 64 60 68 Q44 64 44 46 Z" fill="#F59E0B"/>
+    <path d="M44 30 Q28 32 30 50 Q34 56 44 50" fill="none" stroke="#F59E0B" strokeWidth="4"/>
+    <path d="M76 30 Q92 32 90 50 Q86 56 76 50" fill="none" stroke="#F59E0B" strokeWidth="4"/>
+    <rect x="52" y="68" width="16" height="10" fill="#B45309"/>
+    <rect x="42" y="78" width="36" height="8" rx="2" fill="#92400E"/>
+    <text x="60" y="56" textAnchor="middle" fontSize="14" fontWeight="800" fill="#FFFFFF">1</text>
+  </Frame>,
+  rip: <Frame bg="#F5F5F4">
+    <path d="M22 24 L46 24 L40 38 L48 46 L42 60 L50 70 L40 84 L46 96 L22 96 Z"
+          fill="#FFFFFF" stroke="#6B7280" strokeWidth="2"/>
+    <path d="M74 24 L98 24 L98 96 L74 96 L80 84 L70 70 L78 60 L72 46 L80 38 Z"
+          fill="#FFFFFF" stroke="#6B7280" strokeWidth="2"/>
+    <line x1="30" y1="40" x2="44" y2="40" stroke="#D1D5DB" strokeWidth="1.5"/>
+    <line x1="30" y1="50" x2="44" y2="50" stroke="#D1D5DB" strokeWidth="1.5"/>
+    <line x1="30" y1="60" x2="44" y2="60" stroke="#D1D5DB" strokeWidth="1.5"/>
+    <line x1="76" y1="40" x2="92" y2="40" stroke="#D1D5DB" strokeWidth="1.5"/>
+    <line x1="76" y1="50" x2="92" y2="50" stroke="#D1D5DB" strokeWidth="1.5"/>
+    <line x1="76" y1="60" x2="92" y2="60" stroke="#D1D5DB" strokeWidth="1.5"/>
+  </Frame>,
+  kid: <Frame bg="#FEF3C7">
+    <circle cx="60" cy="44" r="20" fill="#FCD9C5"/>
+    <path d="M44 36 Q44 24 60 22 Q76 24 76 36 Q70 32 60 32 Q50 32 44 36 Z" fill="#92400E"/>
+    <circle cx="54" cy="46" r="2" fill="#1F2937"/>
+    <circle cx="66" cy="46" r="2" fill="#1F2937"/>
+    <path d="M54 54 Q60 58 66 54" stroke="#1F2937" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+    <rect x="42" y="64" width="36" height="32" rx="6" fill="#3B82F6"/>
+    <rect x="38" y="74" width="10" height="18" fill="#FCD9C5"/>
+    <rect x="72" y="74" width="10" height="18" fill="#FCD9C5"/>
+  </Frame>,
+  lip: <Frame bg="#FFE4E6">
+    <path d="M20 60 Q40 36 60 50 Q80 36 100 60 Q80 84 60 70 Q40 84 20 60 Z" fill="#E11D48"/>
+    <path d="M20 60 Q60 50 100 60 Q60 70 20 60 Z" fill="#FB7185"/>
+    <path d="M50 60 Q60 56 70 60" stroke="#FFFFFF" strokeWidth="1.5" fill="none" opacity=".6"/>
+  </Frame>,
+  fin: <Frame bg="#E0F2FE">
+    <path d="M16 62 Q34 40 76 42 Q92 52 94 62 Q92 72 76 84 Q34 86 16 62 Z" fill="#0EA5E9"/>
+    <path d="M44 42 Q52 14 70 22 Q66 32 60 42 Z" fill="#0284C7" stroke="#075985" strokeWidth="2"/>
+    <path d="M52 32 L62 26 M50 38 L60 32" stroke="#FFFFFF" strokeWidth="1.2"/>
+    <polygon points="16,62 2,46 6,62 2,80" fill="#0284C7"/>
+    <path d="M54 84 Q52 94 64 90 Q60 86 54 84 Z" fill="#0284C7"/>
+    <circle cx="78" cy="58" r="4" fill="#FFFFFF"/>
+    <circle cx="78" cy="58" r="2" fill="#1F2937"/>
+    <path d="M84 62 Q88 64 84 68" fill="none" stroke="#FFFFFF" strokeWidth="1.5"/>
+  </Frame>,
+  six: <Frame bg="#EDE9FE">
+    <rect x="22" y="36" width="76" height="48" rx="8" fill="#7C3AED"/>
+    <text x="60" y="76" textAnchor="middle" fontSize="42" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">6</text>
+  </Frame>,
+  mix: <Frame bg="#FFF7ED">
+    <path d="M20 54 L100 54 L92 96 Q90 102 82 102 L38 102 Q30 102 28 96 Z" fill="#FFFFFF" stroke="#78716C" strokeWidth="2.5"/>
+    <ellipse cx="60" cy="54" rx="40" ry="7" fill="#FBBF24"/>
+    <circle cx="44" cy="58" r="3" fill="#EF4444"/>
+    <circle cx="74" cy="60" r="2.5" fill="#16A34A"/>
+    <circle cx="64" cy="56" r="2" fill="#3B82F6"/>
+    <rect x="56" y="8" width="6" height="40" rx="2" fill="#475569"/>
+    <ellipse cx="59" cy="8" rx="6" ry="3" fill="#475569"/>
+    <ellipse cx="59" cy="64" rx="14" ry="20" fill="none" stroke="#94A3B8" strokeWidth="2"/>
+    <line x1="59" y1="44" x2="59" y2="84" stroke="#94A3B8" strokeWidth="2"/>
+    <line x1="49" y1="50" x2="69" y2="78" stroke="#94A3B8" strokeWidth="2"/>
+    <line x1="69" y1="50" x2="49" y2="78" stroke="#94A3B8" strokeWidth="2"/>
+    <path d="M18 80 Q14 70 22 64" stroke="#FB923C" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <polygon points="22,64 17,62 19,68" fill="#FB923C"/>
+    <path d="M102 80 Q106 70 98 64" stroke="#FB923C" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <polygon points="98,64 103,62 101,68" fill="#FB923C"/>
+  </Frame>,
+
+  /* ───── 단모음 o ───── */
+  hop: <Frame bg="#E0F2FE">
+    <ellipse cx="60" cy="100" rx="30" ry="4" fill="#7DD3FC" opacity=".6"/>
+    <ellipse cx="60" cy="62" rx="16" ry="20" fill="#FFFFFF"/>
+    <ellipse cx="52" cy="40" rx="6" ry="14" fill="#FFFFFF"/>
+    <ellipse cx="68" cy="40" rx="6" ry="14" fill="#FFFFFF"/>
+    <circle cx="55" cy="60" r="2" fill="#1F2937"/>
+    <circle cx="65" cy="60" r="2" fill="#1F2937"/>
+    <circle cx="60" cy="68" r="2" fill="#F472B6"/>
+    <path d="M30 92 Q40 86 50 92" stroke="#7DD3FC" strokeWidth="2" fill="none"/>
+    <path d="M70 92 Q80 86 90 92" stroke="#7DD3FC" strokeWidth="2" fill="none"/>
+  </Frame>,
+  mop: <Frame bg="#F0FDF4">
+    <rect x="56" y="14" width="8" height="56" fill="#92400E"/>
+    <ellipse cx="60" cy="70" rx="28" ry="6" fill="#1E40AF"/>
+    <path d="M36 72 Q34 90 30 102 M44 72 Q44 92 42 104 M52 72 Q52 94 50 106 M60 72 L60 108 M68 72 Q68 94 70 106 M76 72 Q76 92 78 104 M84 72 Q86 90 90 102"
+          stroke="#3B82F6" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+  </Frame>,
+  hot: <Frame bg="#FEE2E2">
+    <path d="M60 24 Q44 38 50 56 Q40 60 44 76 Q48 92 60 94 Q72 92 76 76 Q80 60 70 56 Q76 38 60 24 Z" fill="#EF4444"/>
+    <path d="M60 40 Q52 52 56 64 Q50 68 54 78 Q60 86 66 78 Q70 68 64 64 Q68 52 60 40 Z" fill="#FBBF24"/>
+  </Frame>,
+  not: <Frame bg="#FEF2F2">
+    <circle cx="60" cy="60" r="36" fill="none" stroke="#DC2626" strokeWidth="8"/>
+    <line x1="36" y1="36" x2="84" y2="84" stroke="#DC2626" strokeWidth="8" strokeLinecap="round"/>
+  </Frame>,
+  box: <Frame bg="#FEF3C7">
+    <path d="M22 44 L60 30 L98 44 L98 92 L60 106 L22 92 Z" fill="#D97706"/>
+    <path d="M22 44 L60 58 L98 44" fill="none" stroke="#92400E" strokeWidth="2"/>
+    <line x1="60" y1="58" x2="60" y2="106" stroke="#92400E" strokeWidth="2"/>
+    <rect x="48" y="36" width="24" height="6" fill="#F59E0B"/>
+  </Frame>,
+  dog: <Frame bg="#FFF7ED">
+    <ellipse cx="60" cy="68" rx="32" ry="26" fill="#D2B48C"/>
+    <ellipse cx="32" cy="48" rx="10" ry="18" fill="#8B4513" transform="rotate(-20 32 48)"/>
+    <ellipse cx="88" cy="48" rx="10" ry="18" fill="#8B4513" transform="rotate(20 88 48)"/>
+    <circle cx="50" cy="64" r="2.5" fill="#1F2937"/>
+    <circle cx="70" cy="64" r="2.5" fill="#1F2937"/>
+    <ellipse cx="60" cy="74" rx="5" ry="4" fill="#1F2937"/>
+    <path d="M52 80 Q60 88 68 80" stroke="#1F2937" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+    <path d="M62 82 L62 88" stroke="#1F2937" strokeWidth="1.4"/>
+  </Frame>,
+  fox: <Frame bg="#FFEDD5">
+    <polygon points="34,28 28,52 50,46" fill="#EA580C"/>
+    <polygon points="86,28 92,52 70,46" fill="#EA580C"/>
+    <polygon points="38,32 36,46 46,42" fill="#FED7AA"/>
+    <polygon points="82,32 84,46 74,42" fill="#FED7AA"/>
+    <path d="M30 60 Q60 32 90 60 Q88 84 60 92 Q32 84 30 60 Z" fill="#EA580C"/>
+    <path d="M44 72 Q60 84 76 72 Q70 68 60 72 Q50 68 44 72 Z" fill="#FFFFFF"/>
+    <circle cx="50" cy="62" r="3" fill="#1F2937"/>
+    <circle cx="70" cy="62" r="3" fill="#1F2937"/>
+    <polygon points="56,72 64,72 60,80" fill="#1F2937"/>
+  </Frame>,
+  mom: <Frame bg="#FCE7F3">
+    <circle cx="60" cy="40" r="18" fill="#FCD9C5"/>
+    <path d="M40 34 Q40 18 60 18 Q80 18 80 34 Q80 50 80 56 L70 50 Q60 44 50 50 L40 56 Q40 50 40 34 Z" fill="#7C2D12"/>
+    <circle cx="54" cy="42" r="1.8" fill="#1F2937"/>
+    <circle cx="66" cy="42" r="1.8" fill="#1F2937"/>
+    <path d="M52 50 Q60 56 68 50" stroke="#7C2D12" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+    <path d="M30 96 Q32 64 60 64 Q88 64 90 96 Z" fill="#EC4899"/>
+    <path d="M52 68 Q60 76 68 68" stroke="#FFFFFF" strokeWidth="1.5" fill="none"/>
+  </Frame>,
+  pot: <Frame bg="#FEF3C7">
+    <path d="M34 22 Q38 12 32 6" stroke="#9CA3AF" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M52 18 Q56 8 50 2" stroke="#9CA3AF" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M70 18 Q74 8 68 2" stroke="#9CA3AF" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M86 22 Q90 12 84 6" stroke="#9CA3AF" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M18 44 L102 44 L96 92 Q94 100 86 100 L34 100 Q26 100 24 92 Z" fill="#475569"/>
+    <ellipse cx="60" cy="44" rx="42" ry="7" fill="#64748B"/>
+    <ellipse cx="60" cy="44" rx="34" ry="3" fill="#1F2937"/>
+    <ellipse cx="60" cy="46" rx="30" ry="3" fill="#F59E0B"/>
+    <rect x="2" y="50" width="20" height="8" rx="3" fill="#1F2937"/>
+    <rect x="98" y="50" width="20" height="8" rx="3" fill="#1F2937"/>
+  </Frame>,
+  log: <Frame bg="#FEF3C7">
+    <rect x="14" y="40" width="92" height="40" rx="6" fill="#92400E"/>
+    <ellipse cx="14" cy="60" rx="10" ry="20" fill="#A16207"/>
+    <ellipse cx="14" cy="60" rx="6" ry="14" fill="#854D0E"/>
+    <ellipse cx="14" cy="60" rx="2" ry="6" fill="#FEF3C7"/>
+    <path d="M30 50 Q40 56 30 70" stroke="#7C2D12" strokeWidth="1.5" fill="none"/>
+    <path d="M50 50 Q60 56 50 70" stroke="#7C2D12" strokeWidth="1.5" fill="none"/>
+    <path d="M70 50 Q80 56 70 70" stroke="#7C2D12" strokeWidth="1.5" fill="none"/>
+    <path d="M90 50 Q100 56 90 70" stroke="#7C2D12" strokeWidth="1.5" fill="none"/>
+  </Frame>,
+
+  /* ───── 단모음 u ───── */
+  tub: <Frame bg="#E0F2FE">
+    <path d="M16 56 Q14 50 22 50 L98 50 Q106 50 104 56 L96 92 Q94 100 86 100 L34 100 Q26 100 24 92 Z" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="2"/>
+    <path d="M24 58 Q28 70 60 70 Q92 70 96 58" fill="#BFDBFE"/>
+    <path d="M40 60 Q44 56 50 60" stroke="#FFFFFF" strokeWidth="2" fill="none"/>
+    <path d="M70 64 Q74 60 80 64" stroke="#FFFFFF" strokeWidth="2" fill="none"/>
+    <rect x="50" y="34" width="20" height="8" rx="3" fill="#94A3B8"/>
+    <rect x="58" y="42" width="4" height="10" fill="#94A3B8"/>
+  </Frame>,
+  hug: <Frame bg="#FCE7F3">
+    <path d="M22 100 Q24 60 44 60 L48 60 Q52 64 60 64 Q68 64 72 60 L76 60 Q96 60 98 100 Z" fill="#A78BFA"/>
+    <path d="M44 60 Q34 76 28 90" stroke="#A78BFA" strokeWidth="12" strokeLinecap="round" fill="none"/>
+    <path d="M76 60 Q86 76 92 90" stroke="#FB7185" strokeWidth="12" strokeLinecap="round" fill="none"/>
+    <path d="M48 60 Q60 70 72 60" fill="#FB7185"/>
+    <circle cx="42" cy="44" r="16" fill="#FCD9C5"/>
+    <circle cx="78" cy="44" r="16" fill="#F3D2BE"/>
+    <path d="M30 36 Q42 24 56 36" fill="#7C2D12"/>
+    <path d="M64 36 Q78 24 90 36" fill="#451A03"/>
+    <circle cx="38" cy="46" r="1.6" fill="#1F2937"/>
+    <circle cx="46" cy="46" r="1.6" fill="#1F2937"/>
+    <circle cx="74" cy="46" r="1.6" fill="#1F2937"/>
+    <circle cx="82" cy="46" r="1.6" fill="#1F2937"/>
+    <path d="M38 52 Q42 56 46 52" stroke="#1F2937" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+    <path d="M74 52 Q78 56 82 52" stroke="#1F2937" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+    <path d="M60 80 Q56 88 60 94 Q64 88 60 80 Z" fill="#EF4444"/>
+  </Frame>,
+  sun: <Frame bg="#FFFBEB">
+    <circle cx="60" cy="60" r="22" fill="#FBBF24"/>
+    <g stroke="#F59E0B" strokeWidth="4" strokeLinecap="round">
+      <line x1="60" y1="14" x2="60" y2="26"/>
+      <line x1="60" y1="94" x2="60" y2="106"/>
+      <line x1="14" y1="60" x2="26" y2="60"/>
+      <line x1="94" y1="60" x2="106" y2="60"/>
+      <line x1="26" y1="26" x2="34" y2="34"/>
+      <line x1="86" y1="86" x2="94" y2="94"/>
+      <line x1="94" y1="26" x2="86" y2="34"/>
+      <line x1="26" y1="94" x2="34" y2="86"/>
+    </g>
+    <circle cx="52" cy="56" r="2" fill="#7C2D12"/>
+    <circle cx="68" cy="56" r="2" fill="#7C2D12"/>
+    <path d="M52 66 Q60 72 68 66" stroke="#7C2D12" strokeWidth="2" fill="none" strokeLinecap="round"/>
+  </Frame>,
+  cup: <Frame bg="#FEF3C7">
+    <path d="M30 36 L84 36 L80 92 Q78 96 74 96 L40 96 Q36 96 34 92 Z" fill="#FFFFFF" stroke="#78716C" strokeWidth="2"/>
+    <path d="M84 46 Q104 50 100 70 Q96 80 84 76" fill="none" stroke="#78716C" strokeWidth="3"/>
+    <path d="M40 26 Q44 22 46 28 M52 26 Q56 22 58 28 M64 26 Q68 22 70 28" stroke="#FCA5A5" strokeWidth="2" fill="none"/>
+    <ellipse cx="57" cy="48" rx="22" ry="4" fill="#92400E" opacity=".4"/>
+  </Frame>,
+  mud: <Frame bg="#FEF3C7">
+    <ellipse cx="60" cy="92" rx="44" ry="6" fill="#A8A29E"/>
+    <path d="M16 88 Q20 70 36 72 Q44 56 60 64 Q72 50 84 64 Q98 64 102 88 Z" fill="#7C2D12"/>
+    <ellipse cx="40" cy="76" rx="4" ry="3" fill="#FEF3C7" opacity=".5"/>
+    <ellipse cx="68" cy="72" rx="3" ry="2" fill="#FEF3C7" opacity=".5"/>
+    <circle cx="30" cy="50" r="3" fill="#92400E"/>
+    <circle cx="50" cy="42" r="2.5" fill="#92400E"/>
+    <circle cx="82" cy="48" r="3.5" fill="#92400E"/>
+    <circle cx="96" cy="40" r="2.5" fill="#92400E"/>
+    <circle cx="20" cy="40" r="2" fill="#92400E"/>
+  </Frame>,
+  bus: <Frame bg="#FEF9C3">
+    <rect x="14" y="40" width="92" height="46" rx="6" fill="#FACC15"/>
+    <rect x="20" y="48" width="18" height="14" fill="#BFDBFE" stroke="#475569" strokeWidth="1"/>
+    <rect x="42" y="48" width="18" height="14" fill="#BFDBFE" stroke="#475569" strokeWidth="1"/>
+    <rect x="64" y="48" width="18" height="14" fill="#BFDBFE" stroke="#475569" strokeWidth="1"/>
+    <rect x="86" y="48" width="14" height="14" fill="#BFDBFE" stroke="#475569" strokeWidth="1"/>
+    <circle cx="32" cy="90" r="8" fill="#1F2937"/>
+    <circle cx="32" cy="90" r="3" fill="#9CA3AF"/>
+    <circle cx="88" cy="90" r="8" fill="#1F2937"/>
+    <circle cx="88" cy="90" r="3" fill="#9CA3AF"/>
+    <rect x="14" y="76" width="92" height="4" fill="#CA8A04"/>
+  </Frame>,
+  bug: <Frame bg="#FEE2E2">
+    <ellipse cx="60" cy="64" rx="28" ry="32" fill="#DC2626"/>
+    <line x1="60" y1="32" x2="60" y2="96" stroke="#1F2937" strokeWidth="2.5"/>
+    <circle cx="46" cy="50" r="4" fill="#1F2937"/>
+    <circle cx="74" cy="50" r="4" fill="#1F2937"/>
+    <circle cx="42" cy="72" r="5" fill="#1F2937"/>
+    <circle cx="78" cy="72" r="5" fill="#1F2937"/>
+    <circle cx="50" cy="86" r="3" fill="#1F2937"/>
+    <circle cx="70" cy="86" r="3" fill="#1F2937"/>
+    <ellipse cx="60" cy="34" rx="14" ry="8" fill="#1F2937"/>
+    <circle cx="54" cy="32" r="1.4" fill="#FFFFFF"/>
+    <circle cx="66" cy="32" r="1.4" fill="#FFFFFF"/>
+    <line x1="50" y1="22" x2="48" y2="14" stroke="#1F2937" strokeWidth="1.5"/>
+    <line x1="70" y1="22" x2="72" y2="14" stroke="#1F2937" strokeWidth="1.5"/>
+  </Frame>,
+  gum: <Frame bg="#FCE7F3">
+    <path d="M10 64 Q10 38 32 34 Q54 32 58 50 L58 76 Q54 92 32 92 Q10 88 10 64 Z" fill="#FCD9C5"/>
+    <path d="M14 40 Q22 22 40 24 Q36 28 30 32" fill="#7C2D12"/>
+    <circle cx="28" cy="58" r="2" fill="#1F2937"/>
+    <path d="M22 66 Q26 70 30 66" stroke="#7C2D12" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <ellipse cx="54" cy="70" rx="6" ry="4" fill="#7C2D12"/>
+    <circle cx="86" cy="68" r="26" fill="#F472B6" stroke="#DB2777" strokeWidth="2"/>
+    <ellipse cx="78" cy="60" rx="5" ry="7" fill="#FFFFFF" opacity=".5"/>
+    <path d="M60 70 Q66 66 60 64" stroke="#F472B6" strokeWidth="4" fill="none" strokeLinecap="round"/>
+  </Frame>,
+  run: <Frame bg="#DBEAFE">
+    <circle cx="62" cy="22" r="11" fill="#FCD9C5"/>
+    <path d="M52 18 Q60 8 72 14 Q70 12 62 12 Q56 14 52 18 Z" fill="#7C2D12"/>
+    <circle cx="58" cy="22" r="1.4" fill="#1F2937"/>
+    <path d="M62 36 Q56 52 60 70" stroke="#3B82F6" strokeWidth="14" strokeLinecap="round" fill="none"/>
+    <path d="M62 44 Q44 52 36 56" stroke="#FCD9C5" strokeWidth="9" strokeLinecap="round" fill="none"/>
+    <path d="M62 44 Q78 40 88 32" stroke="#FCD9C5" strokeWidth="9" strokeLinecap="round" fill="none"/>
+    <path d="M60 70 Q50 82 42 96" stroke="#FCD9C5" strokeWidth="10" strokeLinecap="round" fill="none"/>
+    <path d="M60 70 Q72 78 78 90" stroke="#FCD9C5" strokeWidth="10" strokeLinecap="round" fill="none"/>
+    <ellipse cx="40" cy="100" rx="9" ry="4" fill="#1F2937"/>
+    <ellipse cx="80" cy="94" rx="9" ry="4" fill="#1F2937"/>
+    <path d="M14 80 L34 80 M8 92 L26 92 M18 70 L30 70" stroke="#60A5FA" strokeWidth="3" strokeLinecap="round"/>
+  </Frame>,
+  nut: <Frame bg="#FFF7ED">
+    <ellipse cx="44" cy="68" rx="26" ry="30" fill="#A16207" stroke="#451A03" strokeWidth="2.5"/>
+    <path d="M44 42 Q24 56 22 78 Q30 92 44 96 Q50 88 48 70 Q44 56 44 42 Z" fill="#92400E"/>
+    <line x1="44" y1="42" x2="44" y2="96" stroke="#451A03" strokeWidth="2"/>
+    <path d="M28 64 Q44 70 60 64" stroke="#451A03" strokeWidth="1.5" fill="none"/>
+    <path d="M28 78 Q44 84 60 78" stroke="#451A03" strokeWidth="1.5" fill="none"/>
+    <ellipse cx="88" cy="80" rx="16" ry="18" fill="#B45309" stroke="#451A03" strokeWidth="2"/>
+    <line x1="88" y1="62" x2="88" y2="98" stroke="#451A03" strokeWidth="1.5"/>
+    <path d="M76 78 Q88 84 100 78" stroke="#451A03" strokeWidth="1.2" fill="none"/>
+  </Frame>,
+
+  /* ───── Level 2: 매직 e (a_e) ───── */
+  cape: <Frame bg="#FEF2F2">
+    <circle cx="60" cy="32" r="12" fill="#FCD9C5"/>
+    <path d="M48 40 L72 40 L78 64 L42 64 Z" fill="#1E40AF"/>
+    <path d="M42 64 Q26 76 22 102 L60 92 L98 102 Q94 76 78 64 Z" fill="#DC2626"/>
+    <path d="M42 64 Q60 70 78 64 Q60 100 60 100 Q60 100 42 64 Z" fill="#B91C1C" opacity=".5"/>
+  </Frame>,
+  tape: <Frame bg="#FEF3C7">
+    <circle cx="60" cy="60" r="36" fill="#3B82F6"/>
+    <circle cx="60" cy="60" r="22" fill="#FEF3C7"/>
+    <circle cx="60" cy="60" r="6" fill="#475569"/>
+    <rect x="40" y="58" width="40" height="14" fill="#1E40AF"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="7" fontWeight="700" fill="#FFFFFF">TAPE</text>
+  </Frame>,
+  hate: <Frame bg="#FEE2E2">
+    <circle cx="60" cy="60" r="34" fill="#FBBF24"/>
+    <path d="M42 50 L52 56 M52 50 L42 56" stroke="#1F2937" strokeWidth="3" strokeLinecap="round"/>
+    <path d="M68 50 L78 56 M78 50 L68 56" stroke="#1F2937" strokeWidth="3" strokeLinecap="round"/>
+    <path d="M46 80 Q60 70 74 80" stroke="#1F2937" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M36 36 L24 28 M84 36 L96 28" stroke="#DC2626" strokeWidth="3" strokeLinecap="round"/>
+  </Frame>,
+  cane: <Frame bg="#FFFBEB">
+    <path d="M40 14 Q60 14 60 36 L60 102" stroke="#92400E" strokeWidth="12" strokeLinecap="round" fill="none"/>
+    <rect x="50" y="20" width="20" height="6" fill="#DC2626"/>
+    <rect x="50" y="38" width="20" height="6" fill="#DC2626"/>
+    <rect x="50" y="56" width="20" height="6" fill="#DC2626"/>
+  </Frame>,
+  mane: <Frame bg="#FFF7ED">
+    <path d="M30 60 Q14 50 18 38 Q24 38 28 46 Q22 26 36 22 Q40 32 42 42 Q40 18 56 18 Q58 30 58 42 Q56 16 76 22 Q78 32 76 44 Q86 26 92 38 Q92 50 84 58 Q98 56 96 70 Q86 80 74 76 Q88 86 76 96 Q66 90 62 84 Q60 100 50 96 Q42 88 42 80 Q30 88 24 78 Q26 68 34 64 Q22 66 22 56 Q26 50 36 54 Z" fill="#D97706"/>
+    <circle cx="60" cy="60" r="20" fill="#FDE68A"/>
+    <circle cx="52" cy="58" r="2.5" fill="#1F2937"/>
+    <circle cx="68" cy="58" r="2.5" fill="#1F2937"/>
+    <ellipse cx="60" cy="68" rx="4" ry="3" fill="#7C2D12"/>
+    <path d="M54 74 Q60 80 66 74" stroke="#7C2D12" strokeWidth="1.8" fill="none"/>
+  </Frame>,
+
+  /* ───── Level 2: 매직 e (e_e) ───── */
+  eve: <Frame bg="#1E1B4B">
+    <circle cx="36" cy="32" r="6" fill="#FCD34D"/>
+    <circle cx="84" cy="22" r="2" fill="#FFFFFF"/>
+    <circle cx="68" cy="14" r="1.5" fill="#FFFFFF"/>
+    <circle cx="96" cy="44" r="2" fill="#FFFFFF"/>
+    <circle cx="20" cy="58" r="1.5" fill="#FFFFFF"/>
+    <rect x="14" y="76" width="14" height="32" fill="#475569"/>
+    <rect x="28" y="86" width="14" height="22" fill="#64748B"/>
+    <rect x="42" y="68" width="20" height="40" fill="#1F2937"/>
+    <rect x="62" y="80" width="16" height="28" fill="#475569"/>
+    <rect x="78" y="74" width="18" height="34" fill="#374151"/>
+    <rect x="50" y="76" width="4" height="6" fill="#FCD34D"/>
+    <rect x="86" y="84" width="4" height="6" fill="#FCD34D"/>
+    <rect x="32" y="92" width="4" height="6" fill="#FCD34D"/>
+  </Frame>,
+  Pete: <Frame bg="#DBEAFE">
+    <circle cx="60" cy="44" r="20" fill="#FCD9C5"/>
+    <path d="M40 38 Q44 22 60 22 Q76 22 80 38 Q70 32 60 32 Q50 32 40 38 Z" fill="#7C2D12"/>
+    <circle cx="54" cy="46" r="2" fill="#1F2937"/>
+    <circle cx="66" cy="46" r="2" fill="#1F2937"/>
+    <path d="M54 56 Q60 60 66 56" stroke="#1F2937" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+    <rect x="36" y="64" width="48" height="40" rx="6" fill="#16A34A"/>
+    <rect x="46" y="78" width="28" height="12" rx="2" fill="#FFFFFF"/>
+    <text x="60" y="88" textAnchor="middle" fontSize="9" fontWeight="800" fill="#16A34A">Pete</text>
+  </Frame>,
+  Steve: <Frame bg="#FEE2E2">
+    <circle cx="60" cy="44" r="20" fill="#F3D2BE"/>
+    <path d="M40 38 Q42 20 60 20 Q78 20 80 38 Q76 30 60 30 Q44 30 40 38 Z" fill="#451A03"/>
+    <circle cx="54" cy="46" r="2" fill="#1F2937"/>
+    <circle cx="66" cy="46" r="2" fill="#1F2937"/>
+    <rect x="48" y="46" width="6" height="3" fill="#451A03"/>
+    <rect x="66" y="46" width="6" height="3" fill="#451A03"/>
+    <path d="M52 58 Q60 62 68 58" stroke="#1F2937" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+    <rect x="36" y="64" width="48" height="40" rx="6" fill="#DC2626"/>
+    <rect x="46" y="78" width="28" height="12" rx="2" fill="#FFFFFF"/>
+    <text x="60" y="88" textAnchor="middle" fontSize="9" fontWeight="800" fill="#DC2626">Steve</text>
+  </Frame>,
+  compete: <Frame bg="#FFFBEB">
+    <ellipse cx="60" cy="100" rx="44" ry="4" fill="#A8A29E"/>
+    <line x1="20" y1="98" x2="100" y2="98" stroke="#FCA5A5" strokeWidth="3"/>
+    <line x1="20" y1="98" x2="20" y2="14" stroke="#94A3B8" strokeWidth="3"/>
+    <path d="M20 14 L46 14 L42 24 L46 34 L20 34 Z" fill="#DC2626"/>
+    <circle cx="36" cy="56" r="8" fill="#FCD9C5"/>
+    <path d="M34 60 Q26 70 30 84 L38 96 L42 96 L40 76 L46 64" stroke="#3B82F6" strokeWidth="6" strokeLinecap="round" fill="none"/>
+    <circle cx="80" cy="50" r="8" fill="#F3D2BE"/>
+    <path d="M78 54 Q70 64 74 80 L82 92 L86 92 L84 70 L90 58" stroke="#16A34A" strokeWidth="6" strokeLinecap="round" fill="none"/>
+  </Frame>,
+
+  /* ───── Level 2: 매직 e (i_e) ───── */
+  bike: <Frame bg="#E0F2FE">
+    <circle cx="36" cy="80" r="18" fill="none" stroke="#1F2937" strokeWidth="3"/>
+    <circle cx="36" cy="80" r="4" fill="#1F2937"/>
+    <circle cx="84" cy="80" r="18" fill="none" stroke="#1F2937" strokeWidth="3"/>
+    <circle cx="84" cy="80" r="4" fill="#1F2937"/>
+    <path d="M36 80 L60 50 L84 80" stroke="#DC2626" strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <path d="M50 50 L60 50 L60 80" stroke="#DC2626" strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <path d="M84 80 L78 56" stroke="#DC2626" strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <rect x="56" y="48" width="10" height="3" rx="1" fill="#1F2937"/>
+    <rect x="74" y="50" width="14" height="3" rx="1" fill="#1F2937"/>
+  </Frame>,
+  ride: <Frame bg="#FFFBEB">
+    <circle cx="32" cy="84" r="14" fill="none" stroke="#1F2937" strokeWidth="3"/>
+    <circle cx="80" cy="84" r="14" fill="none" stroke="#1F2937" strokeWidth="3"/>
+    <path d="M32 84 L56 60 L80 84" stroke="#DC2626" strokeWidth="3" fill="none"/>
+    <path d="M56 60 L56 84" stroke="#DC2626" strokeWidth="3"/>
+    <circle cx="56" cy="40" r="10" fill="#FCD9C5"/>
+    <path d="M50 36 Q56 26 64 30" fill="#7C2D12"/>
+    <path d="M56 48 Q50 60 50 76" stroke="#3B82F6" strokeWidth="6" strokeLinecap="round" fill="none"/>
+    <path d="M58 48 Q66 60 80 60" stroke="#3B82F6" strokeWidth="6" strokeLinecap="round" fill="none"/>
+  </Frame>,
+  hide: <Frame bg="#ECFCCB">
+    <ellipse cx="60" cy="100" rx="48" ry="4" fill="#A3E635"/>
+    <rect x="44" y="48" width="18" height="52" fill="#854D0E"/>
+    <circle cx="46" cy="38" r="26" fill="#65A30D"/>
+    <circle cx="60" cy="26" r="18" fill="#84CC16"/>
+    <circle cx="78" cy="62" r="11" fill="#FFE4C4"/>
+    <circle cx="74" cy="62" r="2" fill="#1F2937"/>
+    <circle cx="82" cy="62" r="2" fill="#1F2937"/>
+    <path d="M74 70 Q78 72 82 70" stroke="#1F2937" strokeWidth="1.6" fill="none"/>
+    <path d="M86 56 L94 50" stroke="#1F2937" strokeWidth="1.2" strokeDasharray="3 2"/>
+  </Frame>,
+  pine: <Frame bg="#ECFCCB">
+    <rect x="54" y="86" width="12" height="14" fill="#7C2D12"/>
+    <polygon points="60,16 36,46 48,46 30,68 50,68 28,90 92,90 70,68 90,68 72,46 84,46" fill="#15803D" stroke="#14532D" strokeWidth="1.5"/>
+    <circle cx="50" cy="56" r="2" fill="#DC2626"/>
+    <circle cx="70" cy="74" r="2" fill="#DC2626"/>
+    <circle cx="60" cy="40" r="2" fill="#FBBF24"/>
+  </Frame>,
+  wine: <Frame bg="#FDF2F8">
+    <rect x="50" y="14" width="20" height="20" fill="#7F1D1D"/>
+    <rect x="46" y="32" width="28" height="44" rx="2" fill="#16A34A"/>
+    <rect x="50" y="38" width="20" height="20" fill="#FEF3C7"/>
+    <text x="60" y="52" textAnchor="middle" fontSize="7" fontWeight="700" fill="#7F1D1D">WINE</text>
+    <ellipse cx="60" cy="80" rx="20" ry="3" fill="#7F1D1D"/>
+    <path d="M48 80 Q48 100 60 100 Q72 100 72 80 Z" fill="#16A34A"/>
+  </Frame>,
+
+  /* ───── Level 2: 매직 e (o_e) ───── */
+  bone: <Frame bg="#F5F5F4">
+    <ellipse cx="60" cy="100" rx="40" ry="4" fill="#78716C" opacity=".3"/>
+    <path d="M14 50 Q4 36 18 28 Q30 26 32 40 L88 40 Q90 26 102 28 Q116 36 106 50 Q116 64 102 72 Q90 74 88 60 L32 60 Q30 74 18 72 Q4 64 14 50 Z" fill="#FFFFFF" stroke="#475569" strokeWidth="2.5"/>
+    <line x1="36" y1="48" x2="84" y2="48" stroke="#94A3B8" strokeWidth="1"/>
+    <line x1="36" y1="54" x2="84" y2="54" stroke="#94A3B8" strokeWidth="1"/>
+  </Frame>,
+  home: <Frame bg="#FEF3C7">
+    <polygon points="14,60 60,18 106,60" fill="#DC2626"/>
+    <rect x="24" y="58" width="72" height="46" fill="#FBBF24"/>
+    <rect x="50" y="74" width="20" height="30" fill="#7C2D12"/>
+    <circle cx="65" cy="90" r="1.5" fill="#FBBF24"/>
+    <rect x="32" y="68" width="12" height="14" fill="#3B82F6"/>
+    <rect x="76" y="68" width="12" height="14" fill="#3B82F6"/>
+    <rect x="74" y="22" width="10" height="20" fill="#7C2D12"/>
+  </Frame>,
+  rose: <Frame bg="#FFE4E6">
+    <rect x="56" y="60" width="6" height="38" fill="#16A34A"/>
+    <path d="M44 76 Q34 70 38 84 Q48 86 56 78 Z" fill="#16A34A"/>
+    <path d="M72 80 Q82 74 78 88 Q68 90 60 82 Z" fill="#16A34A"/>
+    <circle cx="60" cy="40" r="22" fill="#E11D48"/>
+    <path d="M48 40 Q60 28 72 40 Q72 52 60 50 Q48 52 48 40 Z" fill="#DC2626"/>
+    <path d="M54 38 Q60 32 66 38 Q66 46 60 44 Q54 46 54 38 Z" fill="#BE123C"/>
+    <circle cx="60" cy="40" r="3" fill="#7F1D1D"/>
+  </Frame>,
+  nose: <Frame bg="#FFF7ED">
+    <path d="M30 14 Q30 8 60 8 Q90 8 90 14 L90 96 Q90 110 60 110 Q30 110 30 96 Z" fill="#FCD9C5"/>
+    <ellipse cx="40" cy="44" r="4" fill="#1F2937"/>
+    <circle cx="40" cy="44" r="3.5" fill="#1F2937"/>
+    <path d="M52 36 Q60 28 60 50 Q62 70 70 76 Q60 84 52 78 Q48 70 50 60 Q52 50 52 36 Z" fill="#F3D2BE" stroke="#7C2D12" strokeWidth="1.5"/>
+    <ellipse cx="58" cy="80" rx="3" ry="2.5" fill="#7C2D12"/>
+    <ellipse cx="66" cy="80" rx="3" ry="2.5" fill="#7C2D12"/>
+    <path d="M40 90 Q56 96 50 92" stroke="#DC2626" strokeWidth="2.5" fill="none"/>
+    <polygon points="40,92 32,98 38,90" fill="#DC2626"/>
+    <text x="40" y="106" textAnchor="middle" fontSize="8" fontWeight="800" fill="#DC2626">nose</text>
+  </Frame>,
+  cone: <Frame bg="#FFFBEB">
+    <circle cx="46" cy="28" r="14" fill="#FBBF24"/>
+    <circle cx="68" cy="26" r="13" fill="#F472B6"/>
+    <circle cx="58" cy="38" r="12" fill="#A3E635"/>
+    <path d="M30 50 L90 50 L60 108 Z" fill="#D97706"/>
+    <path d="M38 56 L82 56 M44 68 L78 68 M50 80 L74 80" stroke="#92400E" strokeWidth="1.2"/>
+    <path d="M36 56 L60 108 M60 50 L60 108 M84 56 L60 108" stroke="#92400E" strokeWidth="1.2"/>
+  </Frame>,
+
+  /* ───── Level 2: 매직 e (u_e) ───── */
+  tube: <Frame bg="#E0F2FE">
+    <rect x="32" y="20" width="56" height="84" rx="10" fill="#FFFFFF" stroke="#475569" strokeWidth="2"/>
+    <rect x="32" y="20" width="56" height="14" rx="4" fill="#3B82F6"/>
+    <text x="60" y="56" textAnchor="middle" fontSize="9" fontWeight="800" fill="#3B82F6">TOOTH</text>
+    <text x="60" y="68" textAnchor="middle" fontSize="9" fontWeight="800" fill="#3B82F6">PASTE</text>
+    <ellipse cx="60" cy="14" rx="8" ry="4" fill="#1F2937"/>
+  </Frame>,
+  cute: <Frame bg="#FCE7F3">
+    <circle cx="60" cy="60" r="32" fill="#FCD34D"/>
+    <polygon points="36,38 30,18 50,34" fill="#FCD34D"/>
+    <polygon points="84,38 90,18 70,34" fill="#FCD34D"/>
+    <polygon points="40,26 38,20 46,28" fill="#FB7185"/>
+    <polygon points="80,26 82,20 74,28" fill="#FB7185"/>
+    <path d="M44 56 Q48 50 52 56 Z" fill="#1F2937"/>
+    <path d="M68 56 Q72 50 76 56 Z" fill="#1F2937"/>
+    <circle cx="44" cy="68" r="3" fill="#FB7185" opacity=".5"/>
+    <circle cx="76" cy="68" r="3" fill="#FB7185" opacity=".5"/>
+    <polygon points="56,68 64,68 60,74" fill="#1F2937"/>
+    <path d="M54 78 Q60 84 66 78" stroke="#1F2937" strokeWidth="1.8" fill="none"/>
+    <path d="M86 28 L96 12 M94 22 L106 18" stroke="#EF4444" strokeWidth="2" strokeLinecap="round"/>
+    <path d="M88 22 L102 16" stroke="#EF4444" strokeWidth="2" strokeLinecap="round"/>
+  </Frame>,
+  mute: <Frame bg="#FEE2E2">
+    <rect x="42" y="20" width="20" height="40" rx="10" fill="#475569"/>
+    <rect x="48" y="60" width="8" height="20" fill="#475569"/>
+    <rect x="36" y="78" width="32" height="6" rx="2" fill="#475569"/>
+    <circle cx="80" cy="80" r="22" fill="none" stroke="#DC2626" strokeWidth="6"/>
+    <line x1="62" y1="62" x2="98" y2="98" stroke="#DC2626" strokeWidth="6" strokeLinecap="round"/>
+  </Frame>,
+  June: <Frame bg="#FEF3C7">
+    <rect x="14" y="22" width="92" height="86" rx="6" fill="#FFFFFF" stroke="#475569" strokeWidth="2"/>
+    <rect x="14" y="22" width="92" height="20" rx="6" fill="#DC2626"/>
+    <text x="60" y="36" textAnchor="middle" fontSize="13" fontWeight="800" fill="#FFFFFF">JUNE</text>
+    <rect x="24" y="14" width="6" height="14" fill="#475569"/>
+    <rect x="90" y="14" width="6" height="14" fill="#475569"/>
+    <text x="40" y="64" textAnchor="middle" fontSize="9" fill="#475569">M T W</text>
+    <text x="80" y="64" textAnchor="middle" fontSize="9" fill="#475569">T F S</text>
+    <text x="40" y="82" textAnchor="middle" fontSize="9" fill="#475569">1 2 3</text>
+    <text x="80" y="82" textAnchor="middle" fontSize="9" fill="#475569">4 5 6</text>
+    <text x="40" y="100" textAnchor="middle" fontSize="9" fill="#475569">7 8 9</text>
+    <text x="80" y="100" textAnchor="middle" fontSize="9" fill="#DC2626">10 11 12</text>
+  </Frame>,
+  cube: <Frame bg="#EDE9FE">
+    <polygon points="36,40 84,40 100,50 100,98 60,108 20,98 20,50" fill="#A78BFA"/>
+    <polygon points="36,40 60,30 84,40 60,50" fill="#C4B5FD"/>
+    <polygon points="36,40 60,50 60,108 20,98 20,50" fill="#7C3AED"/>
+    <polygon points="84,40 60,50 60,108 100,98 100,50" fill="#8B5CF6"/>
+    <line x1="20" y1="50" x2="60" y2="60" stroke="#5B21B6" strokeWidth="1.5"/>
+    <line x1="100" y1="50" x2="60" y2="60" stroke="#5B21B6" strokeWidth="1.5"/>
+    <line x1="60" y1="60" x2="60" y2="108" stroke="#5B21B6" strokeWidth="1.5"/>
+  </Frame>,
+
+  /* ───── Level 3: 이중자음 sh ───── */
+  shell: <Frame bg="#FDF2F8">
+    <path d="M60 18 Q22 60 30 96 L60 90 L90 96 Q98 60 60 18 Z" fill="#FBCFE8" stroke="#9D174D" strokeWidth="2"/>
+    <line x1="60" y1="22" x2="38" y2="92" stroke="#9D174D" strokeWidth="1.5"/>
+    <line x1="60" y1="22" x2="60" y2="92" stroke="#9D174D" strokeWidth="1.5"/>
+    <line x1="60" y1="22" x2="82" y2="92" stroke="#9D174D" strokeWidth="1.5"/>
+    <line x1="60" y1="22" x2="50" y2="94" stroke="#9D174D" strokeWidth="1"/>
+    <line x1="60" y1="22" x2="70" y2="94" stroke="#9D174D" strokeWidth="1"/>
+  </Frame>,
+  shed: <Frame bg="#F5F5F4">
+    <polygon points="20,52 60,20 100,52" fill="#7C2D12"/>
+    <rect x="26" y="50" width="68" height="54" fill="#A16207"/>
+    <rect x="50" y="68" width="20" height="36" fill="#451A03"/>
+    <circle cx="65" cy="86" r="1.5" fill="#FBBF24"/>
+    <rect x="30" y="60" width="14" height="12" fill="#FEF3C7"/>
+    <rect x="76" y="60" width="14" height="12" fill="#FEF3C7"/>
+  </Frame>,
+  ship: <Frame bg="#E0F2FE">
+    <path d="M14 76 L106 76 L96 100 L24 100 Z" fill="#1F2937"/>
+    <rect x="32" y="58" width="56" height="18" fill="#DC2626"/>
+    <circle cx="42" cy="68" r="3" fill="#FEF3C7"/>
+    <circle cx="58" cy="68" r="3" fill="#FEF3C7"/>
+    <circle cx="74" cy="68" r="3" fill="#FEF3C7"/>
+    <rect x="58" y="22" width="4" height="36" fill="#451A03"/>
+    <polygon points="62,22 86,40 62,56" fill="#FFFFFF"/>
+    <path d="M14 80 Q24 76 34 80 M86 80 Q96 76 106 80" stroke="#3B82F6" strokeWidth="2" fill="none"/>
+  </Frame>,
+  shop: <Frame bg="#FEF3C7">
+    <rect x="18" y="50" width="84" height="50" fill="#FFFFFF" stroke="#78716C" strokeWidth="2"/>
+    <path d="M14 50 L106 50 L98 30 L22 30 Z" fill="#DC2626"/>
+    <path d="M22 30 L98 30 M30 30 L30 50 M42 30 L42 50 M54 30 L54 50 M66 30 L66 50 M78 30 L78 50 M90 30 L90 50" stroke="#FFFFFF" strokeWidth="2"/>
+    <rect x="52" y="64" width="16" height="36" fill="#3B82F6"/>
+    <rect x="26" y="64" width="20" height="20" fill="#FCD9C5"/>
+    <rect x="74" y="64" width="20" height="20" fill="#FCD9C5"/>
+    <text x="60" y="46" textAnchor="middle" fontSize="9" fontWeight="800" fill="#FFFFFF">SHOP</text>
+  </Frame>,
+  fish: <Frame bg="#E0F2FE">
+    <path d="M16 60 Q40 36 84 42 Q98 50 96 60 Q98 70 84 84 Q40 88 16 60 Z" fill="#0EA5E9"/>
+    <polygon points="16,60 2,46 6,60 2,80" fill="#0284C7"/>
+    <circle cx="78" cy="58" r="4" fill="#FFFFFF"/>
+    <circle cx="78" cy="58" r="2" fill="#1F2937"/>
+    <path d="M50 58 Q54 60 50 64" fill="none" stroke="#FFFFFF" strokeWidth="1.5"/>
+    <path d="M40 50 Q48 60 40 70" stroke="#0284C7" strokeWidth="2" fill="none"/>
+  </Frame>,
+
+  /* ───── Level 3: 이중자음 ch ───── */
+  chick: <Frame bg="#FFFBEB">
+    <circle cx="60" cy="60" r="34" fill="#FBBF24"/>
+    <circle cx="60" cy="36" r="22" fill="#FCD34D"/>
+    <circle cx="54" cy="34" r="2.5" fill="#1F2937"/>
+    <circle cx="66" cy="34" r="2.5" fill="#1F2937"/>
+    <polygon points="56,42 64,42 60,52" fill="#F97316"/>
+    <path d="M44 86 L50 90 M76 86 L70 90" stroke="#F97316" strokeWidth="3" strokeLinecap="round"/>
+  </Frame>,
+  chair: <Frame bg="#FEF3C7">
+    <rect x="34" y="20" width="52" height="44" rx="4" fill="#92400E"/>
+    <rect x="34" y="60" width="52" height="10" fill="#7C2D12"/>
+    <rect x="36" y="70" width="8" height="34" fill="#92400E"/>
+    <rect x="76" y="70" width="8" height="34" fill="#92400E"/>
+    <line x1="40" y1="28" x2="80" y2="28" stroke="#FEF3C7" strokeWidth="1"/>
+    <line x1="40" y1="40" x2="80" y2="40" stroke="#FEF3C7" strokeWidth="1"/>
+    <line x1="40" y1="52" x2="80" y2="52" stroke="#FEF3C7" strokeWidth="1"/>
+  </Frame>,
+  chin: <Frame bg="#FFE4E6">
+    <path d="M30 30 Q30 18 60 18 Q90 18 90 30 L90 70 Q90 90 60 100 Q30 90 30 70 Z" fill="#FCD9C5"/>
+    <circle cx="48" cy="44" r="3" fill="#1F2937"/>
+    <circle cx="72" cy="44" r="3" fill="#1F2937"/>
+    <ellipse cx="60" cy="60" rx="6" ry="3" fill="#FB7185"/>
+    <path d="M52 70 Q60 76 68 70" stroke="#1F2937" strokeWidth="2" fill="none"/>
+    <path d="M40 90 Q60 100 80 90" stroke="#DC2626" strokeWidth="3" fill="none"/>
+    <polygon points="80,92 92,98 86,90" fill="#DC2626"/>
+    <text x="60" y="115" textAnchor="middle" fontSize="9" fontWeight="800" fill="#DC2626"></text>
+  </Frame>,
+  chop: <Frame bg="#FEF3C7">
+    <rect x="14" y="80" width="92" height="14" rx="3" fill="#A16207"/>
+    <rect x="14" y="80" width="92" height="4" fill="#7C2D12"/>
+    <path d="M50 14 L74 14 L74 60 L78 60 L78 70 L46 70 L46 60 L50 60 Z" fill="#94A3B8" transform="rotate(20 60 42)"/>
+    <rect x="44" y="60" width="36" height="12" rx="2" fill="#451A03" transform="rotate(20 60 66)"/>
+    <ellipse cx="40" cy="84" rx="6" ry="2" fill="#FCD34D"/>
+    <ellipse cx="80" cy="84" rx="6" ry="2" fill="#16A34A"/>
+  </Frame>,
+  much: <Frame bg="#FEF3C7">
+    <circle cx="34" cy="76" r="16" fill="#FBBF24" stroke="#D97706" strokeWidth="2"/>
+    <text x="34" y="82" textAnchor="middle" fontSize="14" fontWeight="800" fill="#92400E">$</text>
+    <circle cx="60" cy="60" r="20" fill="#FCD34D" stroke="#D97706" strokeWidth="2"/>
+    <text x="60" y="68" textAnchor="middle" fontSize="18" fontWeight="800" fill="#92400E">$</text>
+    <circle cx="86" cy="76" r="16" fill="#FBBF24" stroke="#D97706" strokeWidth="2"/>
+    <text x="86" y="82" textAnchor="middle" fontSize="14" fontWeight="800" fill="#92400E">$</text>
+    <circle cx="50" cy="30" r="10" fill="#FBBF24" stroke="#D97706" strokeWidth="1.5"/>
+    <circle cx="74" cy="32" r="9" fill="#FBBF24" stroke="#D97706" strokeWidth="1.5"/>
+  </Frame>,
+
+  /* ───── Level 3: 이중자음 th ───── */
+  thumb: <Frame bg="#FFF7ED">
+    <path d="M44 100 L44 50 Q44 38 52 38 L60 38 Q66 38 66 44 L66 52 L76 52 Q86 52 86 62 L86 92 Q86 100 78 100 Z" fill="#FCD9C5" stroke="#7C2D12" strokeWidth="2"/>
+    <rect x="44" y="38" width="22" height="14" rx="4" fill="#3B82F6"/>
+    <line x1="56" y1="42" x2="56" y2="50" stroke="#1E40AF"/>
+  </Frame>,
+  three: <Frame bg="#EDE9FE">
+    <rect x="22" y="36" width="76" height="48" rx="8" fill="#7C3AED"/>
+    <text x="60" y="76" textAnchor="middle" fontSize="42" fontWeight="800" fill="#FFFFFF" fontFamily="Fredoka,Nunito">3</text>
+  </Frame>,
+  thin: <Frame bg="#F1F5F9">
+    <ellipse cx="40" cy="100" rx="20" ry="3" fill="#94A3B8" opacity=".5"/>
+    <ellipse cx="84" cy="100" rx="22" ry="3" fill="#94A3B8" opacity=".5"/>
+    <rect x="34" y="40" width="14" height="60" fill="#3B82F6"/>
+    <circle cx="41" cy="32" r="9" fill="#FCD9C5"/>
+    <path d="M36 30 Q42 22 48 28" fill="#7C2D12"/>
+    <rect x="60" y="20" width="40" height="80" rx="6" fill="#3B82F6"/>
+    <circle cx="80" cy="32" r="12" fill="#FCD9C5"/>
+    <path d="M68 30 Q80 18 92 30" fill="#7C2D12"/>
+    <text x="40" y="116" textAnchor="middle" fontSize="8" fontWeight="800" fill="#1F2937">thin</text>
+    <text x="80" y="116" textAnchor="middle" fontSize="8" fontWeight="800" fill="#1F2937">not</text>
+  </Frame>,
+  bath: <Frame bg="#E0F2FE">
+    <path d="M14 58 Q12 52 20 52 L100 52 Q108 52 106 58 L98 92 Q96 100 88 100 L32 100 Q24 100 22 92 Z" fill="#FFFFFF" stroke="#475569" strokeWidth="2"/>
+    <path d="M22 60 Q28 70 60 70 Q92 70 98 60" fill="#BFDBFE"/>
+    <circle cx="40" cy="64" r="4" fill="#FFFFFF" opacity=".8"/>
+    <circle cx="60" cy="66" r="5" fill="#FFFFFF" opacity=".8"/>
+    <circle cx="80" cy="64" r="4" fill="#FFFFFF" opacity=".8"/>
+    <circle cx="48" cy="48" r="3" fill="#FFFFFF" opacity=".6"/>
+    <circle cx="72" cy="46" r="3" fill="#FFFFFF" opacity=".6"/>
+  </Frame>,
+  math: <Frame bg="#FFFBEB">
+    <text x="32" y="50" textAnchor="middle" fontSize="32" fontWeight="800" fill="#DC2626">+</text>
+    <text x="88" y="50" textAnchor="middle" fontSize="32" fontWeight="800" fill="#16A34A">−</text>
+    <text x="32" y="100" textAnchor="middle" fontSize="32" fontWeight="800" fill="#3B82F6">×</text>
+    <text x="88" y="100" textAnchor="middle" fontSize="32" fontWeight="800" fill="#7C3AED">÷</text>
+  </Frame>,
+
+  /* ───── Level 3: 이중자음 ph ───── */
+  phone: <Frame bg="#FEF3C7">
+    <path d="M30 50 Q24 30 40 26 Q50 30 52 44 Q56 60 50 70 Q60 80 70 86 Q80 78 84 68 Q92 70 94 84 Q92 96 78 100 Q40 96 26 60 Q24 54 30 50 Z" fill="#1F2937"/>
+    <circle cx="40" cy="40" r="3" fill="#FBBF24"/>
+    <circle cx="82" cy="86" r="3" fill="#FBBF24"/>
+    <path d="M58 28 Q70 24 78 34 M62 22 Q80 18 90 32" stroke="#0EA5E9" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+  </Frame>,
+  photo: <Frame bg="#F1F5F9">
+    <rect x="14" y="36" width="92" height="56" rx="6" fill="#475569"/>
+    <rect x="50" y="28" width="22" height="14" rx="2" fill="#475569"/>
+    <circle cx="60" cy="64" r="18" fill="#1F2937"/>
+    <circle cx="60" cy="64" r="13" fill="#3B82F6"/>
+    <circle cx="60" cy="64" r="8" fill="#1F2937"/>
+    <circle cx="56" cy="60" r="3" fill="#FFFFFF" opacity=".6"/>
+    <rect x="90" y="42" width="6" height="6" fill="#FBBF24"/>
+  </Frame>,
+  graph: <Frame bg="#F0FDFA">
+    <line x1="20" y1="100" x2="100" y2="100" stroke="#1F2937" strokeWidth="2"/>
+    <line x1="20" y1="100" x2="20" y2="20" stroke="#1F2937" strokeWidth="2"/>
+    <rect x="28" y="70" width="14" height="30" fill="#3B82F6"/>
+    <rect x="48" y="50" width="14" height="50" fill="#16A34A"/>
+    <rect x="68" y="34" width="14" height="66" fill="#F59E0B"/>
+    <rect x="88" y="58" width="10" height="42" fill="#DC2626"/>
+  </Frame>,
+  dolphin: <Frame bg="#E0F2FE">
+    <path d="M20 70 Q40 50 70 56 Q90 60 96 80 Q92 86 80 82 Q72 86 56 84 Q40 90 30 82 Q22 80 20 70 Z" fill="#475569"/>
+    <path d="M64 50 Q76 36 84 52 Q76 56 64 56 Z" fill="#475569"/>
+    <path d="M96 80 Q108 70 104 88 Q98 92 90 84 Z" fill="#475569"/>
+    <circle cx="80" cy="74" r="2" fill="#FFFFFF"/>
+    <circle cx="80" cy="74" r="1" fill="#1F2937"/>
+    <path d="M70 78 Q76 80 70 84" fill="none" stroke="#FFFFFF" strokeWidth="1"/>
+    <path d="M16 96 Q28 92 40 96 Q52 92 64 96 Q76 92 88 96 Q100 92 108 96" stroke="#3B82F6" strokeWidth="2" fill="none"/>
+  </Frame>,
+  elephant: <Frame bg="#F1F5F9">
+    <ellipse cx="64" cy="70" rx="36" ry="28" fill="#9CA3AF"/>
+    <circle cx="40" cy="58" r="18" fill="#9CA3AF"/>
+    <ellipse cx="26" cy="56" rx="10" ry="14" fill="#6B7280"/>
+    <path d="M30 70 Q14 90 22 100 Q34 98 30 86" fill="#9CA3AF"/>
+    <circle cx="44" cy="56" r="2" fill="#1F2937"/>
+    <ellipse cx="42" cy="76" rx="3" ry="3" fill="#1F2937"/>
+    <rect x="44" y="92" width="8" height="14" fill="#6B7280"/>
+    <rect x="60" y="92" width="8" height="14" fill="#6B7280"/>
+    <rect x="78" y="92" width="8" height="14" fill="#6B7280"/>
+    <rect x="92" y="92" width="8" height="14" fill="#6B7280"/>
+  </Frame>,
+
+  /* ───── Level 3: 이중자음 wh ───── */
+  whip: <Frame bg="#FFFBEB">
+    <rect x="14" y="46" width="20" height="8" rx="3" fill="#451A03"/>
+    <path d="M34 50 Q60 30 80 50 Q100 70 70 80 Q60 84 56 76 Q70 70 68 60 Q60 52 50 60 Q42 66 38 78" stroke="#92400E" strokeWidth="4" fill="none" strokeLinecap="round"/>
+  </Frame>,
+  whale: <Frame bg="#E0F2FE">
+    <path d="M16 70 Q30 50 70 50 Q96 54 100 70 Q96 86 70 88 Q40 90 28 82 Q18 80 16 70 Z" fill="#1E40AF"/>
+    <path d="M100 70 Q112 62 110 86 Q102 86 96 76 Z" fill="#1E40AF"/>
+    <ellipse cx="36" cy="80" rx="20" ry="6" fill="#3B82F6"/>
+    <circle cx="36" cy="64" r="2" fill="#FFFFFF"/>
+    <circle cx="36" cy="64" r="1" fill="#1F2937"/>
+    <path d="M24 40 Q30 24 34 32 M32 32 Q38 16 42 28 M42 30 Q48 18 52 30" stroke="#60A5FA" strokeWidth="3" fill="none" strokeLinecap="round"/>
+  </Frame>,
+  white: <Frame bg="#DBEAFE">
+    <ellipse cx="60" cy="100" rx="44" ry="6" fill="#94A3B8" opacity=".4"/>
+    <circle cx="60" cy="84" r="22" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="1.5"/>
+    <circle cx="60" cy="56" r="18" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="1.5"/>
+    <circle cx="60" cy="34" r="14" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="1.5"/>
+    <circle cx="55" cy="32" r="1.5" fill="#1F2937"/>
+    <circle cx="65" cy="32" r="1.5" fill="#1F2937"/>
+    <polygon points="60,36 62,38 58,38" fill="#F97316"/>
+    <path d="M55 42 Q60 44 65 42" stroke="#1F2937" strokeWidth="1.2" fill="none"/>
+    <circle cx="60" cy="50" r="1.8" fill="#1F2937"/>
+    <circle cx="60" cy="60" r="1.8" fill="#1F2937"/>
+    <line x1="40" y1="56" x2="20" y2="50" stroke="#92400E" strokeWidth="2"/>
+    <line x1="80" y1="56" x2="100" y2="50" stroke="#92400E" strokeWidth="2"/>
+  </Frame>,
+  when: <Frame bg="#FEF3C7">
+    <circle cx="60" cy="60" r="40" fill="#FFFFFF" stroke="#1F2937" strokeWidth="3"/>
+    <line x1="60" y1="60" x2="60" y2="32" stroke="#1F2937" strokeWidth="3" strokeLinecap="round"/>
+    <line x1="60" y1="60" x2="82" y2="60" stroke="#1F2937" strokeWidth="2.5" strokeLinecap="round"/>
+    <circle cx="60" cy="60" r="3" fill="#1F2937"/>
+    <text x="60" y="28" textAnchor="middle" fontSize="8" fill="#1F2937">12</text>
+    <text x="92" y="64" textAnchor="middle" fontSize="8" fill="#1F2937">3</text>
+    <text x="60" y="98" textAnchor="middle" fontSize="8" fill="#1F2937">6</text>
+    <text x="28" y="64" textAnchor="middle" fontSize="8" fill="#1F2937">9</text>
+  </Frame>,
+  wheel: <Frame bg="#F5F5F4">
+    <circle cx="60" cy="60" r="42" fill="#1F2937"/>
+    <circle cx="60" cy="60" r="34" fill="#475569"/>
+    <circle cx="60" cy="60" r="8" fill="#1F2937"/>
+    <line x1="60" y1="26" x2="60" y2="94" stroke="#1F2937" strokeWidth="4"/>
+    <line x1="26" y1="60" x2="94" y2="60" stroke="#1F2937" strokeWidth="4"/>
+    <line x1="36" y1="36" x2="84" y2="84" stroke="#1F2937" strokeWidth="4"/>
+    <line x1="84" y1="36" x2="36" y2="84" stroke="#1F2937" strokeWidth="4"/>
+  </Frame>,
+
+  /* ───── Level 3: 함체자음 ng ───── */
+  hang: <Frame bg="#FFFBEB">
+    <line x1="60" y1="14" x2="60" y2="30" stroke="#475569" strokeWidth="3" strokeLinecap="round"/>
+    <path d="M50 30 Q60 22 70 30 L74 38 L46 38 Z" fill="#475569"/>
+    <path d="M28 42 Q60 38 92 42 L90 50 Q60 46 30 50 Z" fill="#1E40AF"/>
+    <path d="M30 50 L24 100 L34 100 L40 60 L60 60 L60 100 L72 100 L72 60 L82 60 L88 100 L98 100 L92 50 Z" fill="#3B82F6"/>
+  </Frame>,
+  sing: <Frame bg="#FCE7F3">
+    <rect x="52" y="56" width="16" height="38" rx="6" fill="#1F2937"/>
+    <ellipse cx="60" cy="44" rx="18" ry="20" fill="#475569"/>
+    <ellipse cx="60" cy="44" rx="12" ry="14" fill="#1F2937"/>
+    <line x1="60" y1="96" x2="44" y2="106" stroke="#1F2937" strokeWidth="3"/>
+    <line x1="60" y1="96" x2="76" y2="106" stroke="#1F2937" strokeWidth="3"/>
+    <circle cx="22" cy="32" r="4" fill="#EC4899"/>
+    <line x1="26" y1="32" x2="26" y2="14" stroke="#EC4899" strokeWidth="2.5"/>
+    <path d="M26 14 Q34 16 34 22 L26 24 Z" fill="#EC4899"/>
+    <circle cx="96" cy="42" r="4" fill="#EC4899"/>
+    <line x1="100" y1="42" x2="100" y2="20" stroke="#EC4899" strokeWidth="2.5"/>
+    <circle cx="106" cy="20" r="2" fill="#EC4899"/>
+    <line x1="100" y1="20" x2="108" y2="22" stroke="#EC4899" strokeWidth="2.5"/>
+    <circle cx="20" cy="64" r="3" fill="#EC4899"/>
+    <line x1="23" y1="64" x2="23" y2="50" stroke="#EC4899" strokeWidth="2"/>
+    <path d="M23 50 Q28 52 30 56" fill="none" stroke="#EC4899" strokeWidth="2"/>
+  </Frame>,
+  king: <Frame bg="#FEF3C7">
+    <path d="M24 60 L34 28 L48 50 L60 22 L72 50 L86 28 L96 60 Z" fill="#FBBF24" stroke="#92400E" strokeWidth="2"/>
+    <rect x="24" y="60" width="72" height="14" fill="#D97706" stroke="#92400E" strokeWidth="2"/>
+    <circle cx="34" cy="32" r="3" fill="#DC2626"/>
+    <circle cx="60" cy="26" r="3" fill="#3B82F6"/>
+    <circle cx="86" cy="32" r="3" fill="#16A34A"/>
+    <circle cx="60" cy="67" r="3" fill="#DC2626"/>
+    <circle cx="40" cy="67" r="2" fill="#16A34A"/>
+    <circle cx="80" cy="67" r="2" fill="#3B82F6"/>
+  </Frame>,
+  long: <Frame bg="#F0FDF4">
+    <circle cx="14" cy="44" r="8" fill="#16A34A"/>
+    <path d="M14 44 Q30 36 50 44 Q70 52 90 44 Q104 40 110 44" stroke="#16A34A" strokeWidth="14" fill="none" strokeLinecap="round"/>
+    <circle cx="10" cy="40" r="1.5" fill="#FFFFFF"/>
+    <path d="M12 46 Q14 50 16 46" stroke="#FFFFFF" strokeWidth="1.4" fill="none"/>
+    <text x="60" y="86" textAnchor="middle" fontSize="10" fontWeight="700" fill="#15803D">긴 뱀</text>
+    <line x1="20" y1="80" x2="100" y2="80" stroke="#16A34A" strokeWidth="2" strokeDasharray="2 3"/>
+  </Frame>,
+  spring: <Frame bg="#FCE7F3">
+    <path d="M40 18 Q80 18 80 30 Q40 30 40 42 Q80 42 80 54 Q40 54 40 66 Q80 66 80 78 Q40 78 40 90 Q70 90 78 96" stroke="#475569" strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <circle cx="78" cy="98" r="3" fill="#475569"/>
+  </Frame>,
+
+  /* ───── Level 4: 이중모음 ai/ay ───── */
+  mail: <Frame bg="#FEF3C7">
+    <rect x="14" y="36" width="92" height="60" rx="4" fill="#FFFFFF" stroke="#475569" strokeWidth="2"/>
+    <path d="M14 38 L60 70 L106 38" fill="none" stroke="#475569" strokeWidth="2"/>
+    <circle cx="92" cy="38" r="8" fill="#DC2626"/>
+    <text x="92" y="42" textAnchor="middle" fontSize="8" fontWeight="800" fill="#FFFFFF">M</text>
+  </Frame>,
+  nail: <Frame bg="#F5F5F4">
+    <ellipse cx="60" cy="22" rx="14" ry="6" fill="#9CA3AF"/>
+    <path d="M50 24 L70 24 L62 96 L58 96 Z" fill="#6B7280"/>
+    <ellipse cx="60" cy="22" rx="14" ry="4" fill="#D1D5DB"/>
+  </Frame>,
+  rain: <Frame bg="#DBEAFE">
+    <ellipse cx="60" cy="36" rx="40" ry="14" fill="#94A3B8"/>
+    <ellipse cx="40" cy="32" rx="20" ry="14" fill="#94A3B8"/>
+    <ellipse cx="80" cy="32" rx="22" ry="14" fill="#94A3B8"/>
+    <path d="M30 60 L26 78 M44 64 L40 84 M60 60 L56 80 M76 62 L72 82 M90 60 L86 78" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round"/>
+    <path d="M38 90 L34 102 M58 94 L54 106 M78 92 L74 104" stroke="#3B82F6" strokeWidth="3" strokeLinecap="round"/>
+  </Frame>,
+  say: <Frame bg="#FEF3C7">
+    <path d="M14 36 Q14 18 32 18 L88 18 Q106 18 106 36 L106 64 Q106 82 88 82 L48 82 L30 100 L36 82 L32 82 Q14 82 14 64 Z" fill="#FFFFFF" stroke="#475569" strokeWidth="2.5"/>
+    <text x="60" y="56" textAnchor="middle" fontSize="14" fontWeight="800" fill="#475569">SAY</text>
+  </Frame>,
+  play: <Frame bg="#E0F2FE">
+    <rect x="18" y="40" width="84" height="48" rx="14" fill="#1F2937"/>
+    <circle cx="42" cy="64" r="6" fill="#FFFFFF"/>
+    <circle cx="58" cy="64" r="6" fill="#FFFFFF"/>
+    <circle cx="74" cy="64" r="6" fill="#FFFFFF"/>
+    <circle cx="90" cy="58" r="3" fill="#DC2626"/>
+    <circle cx="86" cy="64" r="3" fill="#16A34A"/>
+    <circle cx="94" cy="64" r="3" fill="#3B82F6"/>
+    <circle cx="90" cy="70" r="3" fill="#FBBF24"/>
+  </Frame>,
+
+  /* ───── Level 4: 이중모음 ee ───── */
+  bee: <Frame bg="#FEF3C7">
+    <ellipse cx="60" cy="64" rx="30" ry="22" fill="#FBBF24"/>
+    <rect x="34" y="56" width="52" height="6" fill="#1F2937"/>
+    <rect x="34" y="68" width="52" height="6" fill="#1F2937"/>
+    <ellipse cx="40" cy="50" rx="14" ry="8" fill="#FFFFFF" opacity=".8"/>
+    <ellipse cx="80" cy="50" rx="14" ry="8" fill="#FFFFFF" opacity=".8"/>
+    <circle cx="50" cy="56" r="2" fill="#1F2937"/>
+    <line x1="38" y1="40" x2="34" y2="32" stroke="#1F2937" strokeWidth="2"/>
+    <line x1="82" y1="40" x2="86" y2="32" stroke="#1F2937" strokeWidth="2"/>
+  </Frame>,
+  tree: <Frame bg="#ECFCCB">
+    <rect x="54" y="78" width="12" height="22" fill="#7C2D12"/>
+    <circle cx="60" cy="46" r="32" fill="#15803D"/>
+    <circle cx="42" cy="56" r="20" fill="#16A34A"/>
+    <circle cx="78" cy="56" r="20" fill="#22C55E"/>
+    <circle cx="50" cy="38" r="3" fill="#DC2626"/>
+    <circle cx="70" cy="50" r="3" fill="#DC2626"/>
+    <circle cx="58" cy="60" r="3" fill="#DC2626"/>
+  </Frame>,
+  see: <Frame bg="#E0F2FE">
+    <ellipse cx="60" cy="60" rx="44" ry="26" fill="#FFFFFF" stroke="#1F2937" strokeWidth="2.5"/>
+    <circle cx="60" cy="60" r="20" fill="#3B82F6"/>
+    <circle cx="60" cy="60" r="10" fill="#1F2937"/>
+    <circle cx="56" cy="56" r="3" fill="#FFFFFF"/>
+    <path d="M20 60 Q60 30 100 60 Q60 90 20 60 Z" fill="none" stroke="#1F2937" strokeWidth="2.5"/>
+  </Frame>,
+  knee: <Frame bg="#FEF3C7">
+    <path d="M50 14 Q46 30 50 50 L46 60 L42 100 L58 100 L62 60 L66 50 Q70 30 64 14 Z" fill="#FCD9C5"/>
+    <circle cx="54" cy="56" r="10" fill="#F3D2BE" stroke="#7C2D12" strokeWidth="2"/>
+    <path d="M50 92 L60 96 L60 102 L50 102 Z" fill="#1F2937"/>
+  </Frame>,
+  feet: <Frame bg="#FEF3C7">
+    <path d="M24 70 Q22 50 36 48 Q56 48 56 60 L56 90 Q56 96 50 98 Q30 96 26 88 Q24 80 24 70 Z" fill="#FCD9C5"/>
+    <circle cx="40" cy="44" r="4" fill="#FCD9C5"/>
+    <circle cx="46" cy="42" r="3" fill="#FCD9C5"/>
+    <circle cx="52" cy="42" r="3" fill="#FCD9C5"/>
+    <path d="M64 70 Q62 50 76 48 Q96 48 96 60 L96 90 Q96 96 90 98 Q70 96 66 88 Q64 80 64 70 Z" fill="#F3D2BE"/>
+    <circle cx="80" cy="44" r="4" fill="#F3D2BE"/>
+    <circle cx="86" cy="42" r="3" fill="#F3D2BE"/>
+    <circle cx="92" cy="42" r="3" fill="#F3D2BE"/>
+  </Frame>,
+
+  /* ───── Level 4: 이중모음 ea ───── */
+  sea: <Frame bg="#E0F2FE">
+    <path d="M0 40 Q30 28 60 40 Q90 52 120 40 L120 120 L0 120 Z" fill="#0EA5E9"/>
+    <path d="M0 56 Q30 44 60 56 Q90 68 120 56" stroke="#FFFFFF" strokeWidth="2" fill="none" opacity=".5"/>
+    <path d="M0 76 Q30 64 60 76 Q90 88 120 76" stroke="#FFFFFF" strokeWidth="2" fill="none" opacity=".5"/>
+    <circle cx="100" cy="20" r="12" fill="#FBBF24"/>
+  </Frame>,
+  tea: <Frame bg="#FFFBEB">
+    <path d="M30 50 L90 50 L82 90 Q80 96 74 96 L46 96 Q40 96 38 90 Z" fill="#FFFFFF" stroke="#475569" strokeWidth="2"/>
+    <path d="M90 60 Q108 64 104 80 Q100 88 90 84" stroke="#475569" strokeWidth="3" fill="none"/>
+    <ellipse cx="60" cy="50" rx="30" ry="4" fill="#92400E"/>
+    <path d="M44 34 Q48 24 44 14 M60 34 Q64 24 60 14 M76 34 Q80 24 76 14" stroke="#FCA5A5" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <ellipse cx="36" cy="68" rx="4" ry="6" fill="#16A34A"/>
+  </Frame>,
+  meat: <Frame bg="#FEE2E2">
+    <path d="M30 50 Q30 30 60 28 Q92 30 96 56 Q98 80 76 92 Q60 96 44 92 Q26 80 30 50 Z" fill="#DC2626" stroke="#7F1D1D" strokeWidth="2"/>
+    <path d="M40 56 Q60 48 80 56 Q86 64 80 76 Q60 84 40 76 Z" fill="#F87171"/>
+    <ellipse cx="44" cy="40" rx="6" ry="3" fill="#FCD9C5"/>
+    <line x1="30" y1="50" x2="22" y2="40" stroke="#FCD9C5" strokeWidth="5" strokeLinecap="round"/>
+  </Frame>,
+  beach: <Frame bg="#FEF3C7">
+    <path d="M0 70 Q60 60 120 70 L120 92 L0 92 Z" fill="#FCD34D"/>
+    <path d="M0 92 Q60 86 120 92 L120 120 L0 120 Z" fill="#0EA5E9"/>
+    <rect x="56" y="40" width="3" height="50" fill="#7C2D12"/>
+    <path d="M58 40 Q70 38 80 50 Q70 50 58 50 Z" fill="#DC2626"/>
+    <path d="M58 40 Q46 38 36 50 Q46 50 58 50 Z" fill="#FBBF24"/>
+    <circle cx="92" cy="26" r="10" fill="#FBBF24"/>
+    <path d="M14 90 Q18 86 22 90 M30 90 Q34 86 38 90" stroke="#FFFFFF" strokeWidth="2" fill="none"/>
+  </Frame>,
+  read: <Frame bg="#F5F5F4">
+    <path d="M20 30 L60 24 L60 100 L20 96 Z" fill="#FFFFFF" stroke="#475569" strokeWidth="2"/>
+    <path d="M100 30 L60 24 L60 100 L100 96 Z" fill="#FFFFFF" stroke="#475569" strokeWidth="2"/>
+    <line x1="60" y1="24" x2="60" y2="100" stroke="#475569" strokeWidth="2"/>
+    <line x1="28" y1="44" x2="52" y2="40" stroke="#94A3B8" strokeWidth="1.5"/>
+    <line x1="28" y1="54" x2="52" y2="50" stroke="#94A3B8" strokeWidth="1.5"/>
+    <line x1="28" y1="64" x2="52" y2="60" stroke="#94A3B8" strokeWidth="1.5"/>
+    <line x1="28" y1="74" x2="52" y2="70" stroke="#94A3B8" strokeWidth="1.5"/>
+    <line x1="68" y1="40" x2="92" y2="44" stroke="#94A3B8" strokeWidth="1.5"/>
+    <line x1="68" y1="50" x2="92" y2="54" stroke="#94A3B8" strokeWidth="1.5"/>
+    <line x1="68" y1="60" x2="92" y2="64" stroke="#94A3B8" strokeWidth="1.5"/>
+    <line x1="68" y1="70" x2="92" y2="74" stroke="#94A3B8" strokeWidth="1.5"/>
+  </Frame>,
+
+  /* ───── Level 4: 이중모음 oa ───── */
+  boat: <Frame bg="#E0F2FE">
+    <path d="M14 70 L106 70 L96 92 L24 92 Z" fill="#92400E"/>
+    <rect x="58" y="20" width="4" height="50" fill="#451A03"/>
+    <polygon points="62,22 88,56 62,56" fill="#FFFFFF"/>
+    <polygon points="58,22 32,56 58,56" fill="#FCD34D"/>
+    <path d="M14 92 Q24 88 34 92 Q44 88 54 92 Q64 88 74 92 Q84 88 94 92 Q104 88 106 92" stroke="#3B82F6" strokeWidth="2" fill="none"/>
+  </Frame>,
+  coat: <Frame bg="#FEF2F2">
+    <path d="M30 30 L46 22 L60 32 L74 22 L90 30 L98 100 L74 100 L72 60 L48 60 L46 100 L22 100 Z" fill="#DC2626"/>
+    <path d="M46 22 L60 32 L74 22" fill="none" stroke="#FFFFFF" strokeWidth="2"/>
+    <circle cx="60" cy="48" r="3" fill="#FBBF24"/>
+    <circle cx="60" cy="64" r="3" fill="#FBBF24"/>
+    <circle cx="60" cy="80" r="3" fill="#FBBF24"/>
+  </Frame>,
+  goat: <Frame bg="#F5F5F4">
+    <ellipse cx="60" cy="74" rx="32" ry="22" fill="#FFFFFF" stroke="#78716C" strokeWidth="2"/>
+    <ellipse cx="40" cy="56" rx="14" ry="18" fill="#FFFFFF" stroke="#78716C" strokeWidth="2"/>
+    <path d="M32 44 Q28 30 36 28 Q40 36 42 44 Z" fill="#94A3B8"/>
+    <path d="M48 44 Q52 30 44 28 Q40 36 38 44 Z" fill="#94A3B8"/>
+    <circle cx="36" cy="54" r="2" fill="#1F2937"/>
+    <ellipse cx="32" cy="62" rx="3" ry="2" fill="#1F2937"/>
+    <path d="M36 62 Q38 58 40 60 Q42 62 40 64" fill="#FFFFFF"/>
+    <rect x="44" y="92" width="6" height="14" fill="#475569"/>
+    <rect x="70" y="92" width="6" height="14" fill="#475569"/>
+    <rect x="56" y="92" width="6" height="14" fill="#475569"/>
+  </Frame>,
+  road: <Frame bg="#F5F5F4">
+    <path d="M40 18 L80 18 L96 100 L24 100 Z" fill="#475569"/>
+    <line x1="60" y1="22" x2="60" y2="32" stroke="#FBBF24" strokeWidth="3"/>
+    <line x1="60" y1="42" x2="60" y2="52" stroke="#FBBF24" strokeWidth="3"/>
+    <line x1="60" y1="62" x2="60" y2="72" stroke="#FBBF24" strokeWidth="3"/>
+    <line x1="60" y1="82" x2="60" y2="96" stroke="#FBBF24" strokeWidth="3"/>
+    <path d="M0 100 L40 18 M120 100 L80 18" stroke="#FFFFFF" strokeWidth="3"/>
+  </Frame>,
+  soap: <Frame bg="#FFE4E6">
+    <rect x="22" y="40" width="76" height="50" rx="8" fill="#F9A8D4" stroke="#9D174D" strokeWidth="2"/>
+    <text x="60" y="70" textAnchor="middle" fontSize="13" fontWeight="800" fill="#FFFFFF">SOAP</text>
+    <circle cx="34" cy="28" r="6" fill="#FFFFFF" opacity=".8"/>
+    <circle cx="48" cy="22" r="4" fill="#FFFFFF" opacity=".8"/>
+    <circle cx="60" cy="20" r="5" fill="#FFFFFF" opacity=".8"/>
+    <circle cx="76" cy="24" r="4" fill="#FFFFFF" opacity=".8"/>
+    <circle cx="92" cy="28" r="3" fill="#FFFFFF" opacity=".8"/>
+  </Frame>,
+
+  /* ───── Level 4: 이중모음 ow ───── */
+  snow: <Frame bg="#DBEAFE">
+    <text x="30" y="38" fontSize="20" fill="#FFFFFF">❄</text>
+    <text x="70" y="42" fontSize="22" fill="#FFFFFF">❄</text>
+    <text x="20" y="70" fontSize="18" fill="#FFFFFF">❄</text>
+    <text x="90" y="74" fontSize="18" fill="#FFFFFF">❄</text>
+    <circle cx="60" cy="80" r="18" fill="#FFFFFF"/>
+    <circle cx="60" cy="56" r="12" fill="#FFFFFF"/>
+    <circle cx="56" cy="54" r="1.5" fill="#1F2937"/>
+    <circle cx="64" cy="54" r="1.5" fill="#1F2937"/>
+    <polygon points="60,58 64,60 60,62" fill="#F97316"/>
+    <path d="M14 100 L106 100" stroke="#FFFFFF" strokeWidth="6"/>
+  </Frame>,
+  blow: <Frame bg="#F0F9FF">
+    <circle cx="36" cy="60" r="20" fill="#FCD9C5"/>
+    <path d="M30 50 Q36 40 42 50" fill="#7C2D12"/>
+    <circle cx="32" cy="60" r="1.6" fill="#1F2937"/>
+    <ellipse cx="44" cy="64" rx="6" ry="4" fill="#7C2D12"/>
+    <path d="M52 62 Q70 50 88 60 Q96 64 88 68 Q70 72 54 68" stroke="#94A3B8" strokeWidth="2.5" fill="none"/>
+    <path d="M58 56 Q74 46 92 54" stroke="#94A3B8" strokeWidth="2" fill="none" opacity=".6"/>
+    <path d="M60 76 Q76 80 96 76" stroke="#94A3B8" strokeWidth="2" fill="none" opacity=".6"/>
+  </Frame>,
+  tow: <Frame bg="#FEF3C7">
+    <rect x="20" y="50" width="36" height="30" rx="3" fill="#DC2626"/>
+    <rect x="24" y="56" width="14" height="14" fill="#BFDBFE"/>
+    <circle cx="28" cy="84" r="6" fill="#1F2937"/>
+    <circle cx="48" cy="84" r="6" fill="#1F2937"/>
+    <line x1="56" y1="70" x2="76" y2="70" stroke="#1F2937" strokeWidth="3"/>
+    <rect x="76" y="58" width="30" height="22" fill="#475569"/>
+    <circle cx="82" cy="84" r="6" fill="#1F2937"/>
+    <circle cx="102" cy="84" r="6" fill="#1F2937"/>
+    <text x="38" y="46" textAnchor="middle" fontSize="9" fontWeight="800" fill="#FFFFFF">TOW</text>
+  </Frame>,
+  cow: <Frame bg="#FFFBEB">
+    <ellipse cx="60" cy="70" rx="38" ry="26" fill="#FFFFFF" stroke="#1F2937" strokeWidth="2"/>
+    <ellipse cx="42" cy="60" rx="12" ry="8" fill="#1F2937"/>
+    <ellipse cx="78" cy="76" rx="14" ry="10" fill="#1F2937"/>
+    <circle cx="38" cy="46" r="14" fill="#FFFFFF" stroke="#1F2937" strokeWidth="2"/>
+    <circle cx="32" cy="44" r="2" fill="#1F2937"/>
+    <ellipse cx="40" cy="54" rx="4" ry="3" fill="#FB7185"/>
+    <path d="M26 32 Q22 24 30 26 Q28 32 30 36 Z" fill="#9CA3AF"/>
+    <rect x="46" y="92" width="5" height="12" fill="#1F2937"/>
+    <rect x="68" y="92" width="5" height="12" fill="#1F2937"/>
+  </Frame>,
+  down: <Frame bg="#FEE2E2">
+    <polygon points="44,50 76,50 76,34 90,34 60,12 30,34 44,34" fill="#A7F3D0" stroke="#16A34A" strokeWidth="1.5"/>
+    <text x="60" y="74" textAnchor="middle" fontSize="11" fontWeight="800" fill="#475569">DOWN ↓</text>
+    <polygon points="44,82 76,82 76,98 90,98 60,114 30,98 44,98" fill="#DC2626"/>
+  </Frame>,
+
+  /* ───── Level 4: 이중모음 oi/oy ───── */
+  oil: <Frame bg="#FEF3C7">
+    <path d="M40 34 L80 34 L84 50 L84 96 Q84 102 78 102 L42 102 Q36 102 36 96 L36 50 Z" fill="#FBBF24" stroke="#92400E" strokeWidth="2"/>
+    <rect x="40" y="22" width="40" height="14" rx="3" fill="#92400E"/>
+    <rect x="46" y="46" width="28" height="40" fill="#FFFFFF"/>
+    <text x="60" y="72" textAnchor="middle" fontSize="14" fontWeight="800" fill="#92400E">OIL</text>
+  </Frame>,
+  coin: <Frame bg="#FFFBEB">
+    <circle cx="60" cy="60" r="40" fill="#FBBF24" stroke="#D97706" strokeWidth="3"/>
+    <circle cx="60" cy="60" r="32" fill="none" stroke="#D97706" strokeWidth="2"/>
+    <text x="60" y="74" textAnchor="middle" fontSize="32" fontWeight="800" fill="#92400E">$</text>
+    <circle cx="48" cy="40" r="3" fill="#FCD34D" opacity=".8"/>
+  </Frame>,
+  boy: <Frame bg="#DBEAFE">
+    <circle cx="60" cy="40" r="20" fill="#FCD9C5"/>
+    <path d="M40 36 Q44 18 60 18 Q76 18 80 36 Q70 30 60 30 Q50 30 40 36 Z" fill="#7C2D12"/>
+    <circle cx="54" cy="42" r="2" fill="#1F2937"/>
+    <circle cx="66" cy="42" r="2" fill="#1F2937"/>
+    <path d="M54 52 Q60 56 66 52" stroke="#1F2937" strokeWidth="1.8" fill="none"/>
+    <rect x="36" y="60" width="48" height="40" rx="6" fill="#3B82F6"/>
+    <rect x="28" y="72" width="14" height="18" rx="3" fill="#FCD9C5"/>
+    <rect x="78" y="72" width="14" height="18" rx="3" fill="#FCD9C5"/>
+    <rect x="42" y="100" width="14" height="6" fill="#1F2937"/>
+    <rect x="64" y="100" width="14" height="6" fill="#1F2937"/>
+  </Frame>,
+  toy: <Frame bg="#FCE7F3">
+    <circle cx="60" cy="64" r="34" fill="#92400E"/>
+    <circle cx="60" cy="40" r="20" fill="#A16207"/>
+    <circle cx="44" cy="32" r="10" fill="#A16207"/>
+    <circle cx="76" cy="32" r="10" fill="#A16207"/>
+    <circle cx="44" cy="32" r="5" fill="#FCD9C5"/>
+    <circle cx="76" cy="32" r="5" fill="#FCD9C5"/>
+    <circle cx="54" cy="40" r="2" fill="#1F2937"/>
+    <circle cx="66" cy="40" r="2" fill="#1F2937"/>
+    <ellipse cx="60" cy="48" rx="3" ry="2" fill="#1F2937"/>
+    <path d="M54 56 Q60 60 66 56" stroke="#1F2937" strokeWidth="1.6" fill="none"/>
+    <rect x="44" y="80" width="32" height="20" rx="4" fill="#DC2626"/>
+  </Frame>,
+  joy: <Frame bg="#FFFBEB">
+    <circle cx="60" cy="60" r="36" fill="#FBBF24"/>
+    <path d="M40 50 Q48 42 56 50" stroke="#1F2937" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M64 50 Q72 42 80 50" stroke="#1F2937" strokeWidth="3" fill="none" strokeLinecap="round"/>
+    <path d="M36 68 Q60 92 84 68 Q60 80 36 68 Z" fill="#1F2937"/>
+    <path d="M36 68 Q60 80 84 68" fill="#FB7185"/>
+    <circle cx="44" cy="74" r="4" fill="#FB7185" opacity=".6"/>
+    <circle cx="76" cy="74" r="4" fill="#FB7185" opacity=".6"/>
+  </Frame>,
+};
+
+/* =========================================================
+   5) 폴백 일러스트 컴포넌트
+      ILLUS에 자체 SVG가 있으면 그걸,
+      없으면 EMOJI_MAP의 이모지를,
+      그것마저 없으면 단어 첫 글자를 표시.
+   ========================================================= */
+const EmojiFrame = ({emoji, bg='#FFF7ED'}) => (
+  <div className="w-full h-full rounded-2xl flex items-center justify-center"
+       style={{background: bg, fontSize: '72px', lineHeight:1}}>
+    <span style={{filter:'drop-shadow(0 2px 4px rgba(0,0,0,.06))'}}>{emoji}</span>
+  </div>
+);
+const InitialFrame = ({letter}) => (
+  <div className="w-full h-full rounded-2xl flex items-center justify-center bg-stone-100">
+    <span className="text-6xl font-extrabold text-stone-400 word-en">{letter.toUpperCase()}</span>
+  </div>
+);
+const Illustration = ({word}) => {
+  if (ILLUS[word]) return ILLUS[word];
+  if (EMOJI_MAP[word]) return <EmojiFrame emoji={EMOJI_MAP[word]}/>;
+  return <InitialFrame letter={word[0]}/>;
+};
+
+/* =========================================================
+   6) 입 모양 SVG (5개 단모음)
+   ========================================================= */
+const MouthSVG = ({stage}) => {
+  const shapes = {
+    a: <>
+      <ellipse cx="60" cy="60" rx="34" ry="8" fill="#FCA5A5"/>
+      <ellipse cx="60" cy="62" rx="20" ry="14" fill="#7F1D1D"/>
+      <ellipse cx="60" cy="78" rx="14" ry="3" fill="#FB7185" opacity=".8"/>
+    </>,
+    e: <>
+      <ellipse cx="60" cy="60" rx="38" ry="10" fill="#FCA5A5"/>
+      <ellipse cx="60" cy="60" rx="30" ry="4" fill="#7F1D1D"/>
+      <rect x="40" y="58" width="40" height="4" fill="#FFFFFF" opacity=".5"/>
+    </>,
+    i: <>
+      <ellipse cx="60" cy="60" rx="42" ry="6" fill="#FCA5A5"/>
+      <ellipse cx="60" cy="60" rx="34" ry="2" fill="#7F1D1D"/>
+      <rect x="36" y="58" width="48" height="4" fill="#FFFFFF" opacity=".6"/>
+    </>,
+    o: <>
+      <circle cx="60" cy="60" r="14" fill="#FCA5A5"/>
+      <circle cx="60" cy="60" r="8" fill="#7F1D1D"/>
+    </>,
+    u: <>
+      <ellipse cx="60" cy="60" rx="14" ry="9" fill="#FCA5A5"/>
+      <ellipse cx="60" cy="60" rx="8" ry="5" fill="#7F1D1D"/>
+    </>,
+  };
+  return (
+    <svg viewBox="0 0 120 120" className="w-full h-full">
+      <rect width="120" height="120" rx="18" fill="#FFF7ED"/>
+      <path d="M20 60 Q60 30 100 60 Q60 90 20 60 Z" fill="#FFE4E6" opacity=".7"/>
+      {shapes[stage]}
+    </svg>
+  );
+};
+
+/* =========================================================
+   7) Web Speech API — Chrome 버그 대응판
+      - cancel() 직후 즉시 speak()를 호출하면 무시되는 버그(120ms 지연으로 회피)
+      - 페이지 로드 15초 후 자동 sleep되는 버그 (resume()으로 깨움)
+      - voices 비어있을 때 onvoiceschanged 대기 후 재시도
+      - 영어 음성이 시스템에 없을 때 안내 (한국 윈도우 일부)
+   ========================================================= */
+let _voicesReady = false;
+let _speakWatchdog = null;
+
+const ensureSpeechAlive = () => {
+  if (!('speechSynthesis' in window)) return;
+  if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+};
+
+const pickEnglishVoice = () => {
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices || voices.length === 0) return null;
+  return voices.find(v => /en[-_]?(US|GB)/i.test(v.lang) && /female|samantha|google|microsoft/i.test(v.name))
+      || voices.find(v => /en[-_]?(US|GB)/i.test(v.lang))
+      || voices.find(v => /^en/i.test(v.lang));
+};
+
+const _doSpeak = (text, opts) => {
+  ensureSpeechAlive();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = opts.lang || 'en-US';
+  u.rate = opts.rate ?? 1;
+  u.pitch = opts.pitch ?? 1;
+  const enVoice = pickEnglishVoice();
+  if (enVoice) u.voice = enVoice;
+  u.onstart = opts.onstart || null;
+  u.onend = opts.onend || null;
+  u.onerror = (e) => { console.warn('Speech error:', e); opts.onerror && opts.onerror(e); };
+  try {
+    window.speechSynthesis.speak(u);
+    // 워치독: Chrome이 speak를 1초 안에 시작하지 않으면 한 번 더 트리거
+    clearTimeout(_speakWatchdog);
+    _speakWatchdog = setTimeout(() => {
+      if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+        try { window.speechSynthesis.speak(new SpeechSynthesisUtterance(text)); } catch {}
+      }
+    }, 800);
+  } catch (e) {
+    console.error('Speech failed:', e);
+  }
+};
+
+const speak = (text, opts={}) => {
+  if (!('speechSynthesis' in window)) {
+    console.warn('이 브라우저는 음성 합성을 지원하지 않습니다.');
+    return;
+  }
+  // voices가 아직 안 왔으면 한 번 더 기다렸다가 재시도
+  if (!_voicesReady && window.speechSynthesis.getVoices().length === 0) {
+    setTimeout(() => speak(text, opts), 250);
+    return;
+  }
+  _voicesReady = true;
+
+  // 이미 재생 중이면 cancel 후 충분히 지연하고 다시 호출 (Chrome 버그 회피)
+  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+    window.speechSynthesis.cancel();
+    setTimeout(() => _doSpeak(text, opts), 120);
+    return;
+  }
+  _doSpeak(text, opts);
+};
+
+// Chrome 자동 sleep 방지 — 14초마다 한번 깨워주기
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  setInterval(() => {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
+    }
+  }, 14000);
+}
+
+/* =========================================================
+   8) localStorage 진도 훅
+   ========================================================= */
+const usePersist = (key, init) => {
+  const [val, setVal] = useState(() => {
+    try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : init; }
+    catch { return init; }
+  });
+  useEffect(() => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }, [key, val]);
+  return [val, setVal];
+};
+
+/* =========================================================
+   9) 공통 UI
+   ========================================================= */
+const TopBar = ({onHome, title, right}) => (
+  <header className="w-full flex items-center justify-between px-5 py-3 bg-white/80 backdrop-blur sticky top-0 z-10 border-b border-stone-200">
+    <button onClick={onHome} className="flex items-center gap-2 text-stone-600 hover:text-stone-900">
+      <span className="text-xl">🏠</span><span className="text-sm">홈</span>
+    </button>
+    <h1 className="font-semibold text-stone-700">{title}</h1>
+    <div className="text-sm text-stone-500">{right}</div>
+  </header>
+);
+
+const TOTAL = Object.values(WORDS).reduce((a,b)=>a+b.length,0);
+
+/* =========================================================
+   10) 홈
+   ========================================================= */
+const HomeView = ({onStart, progress}) => {
+  const done = Object.values(progress.words||{}).filter(v => v.completed).length;
+  return (
+    <div className="max-w-2xl mx-auto px-5 py-8 pop-in">
+      <div className="text-center mb-8">
+        <div className="text-5xl mb-3">🔤</div>
+        <h1 className="text-3xl font-extrabold text-stone-800">진짜 쉬운 파닉스</h1>
+        <p className="text-stone-500 mt-2">알파벳 소리를 하나씩 분리해서 듣고, 빠르게 합쳐서 단어로 읽어봐요.</p>
+      </div>
+      <div className="bg-white rounded-3xl shadow-sm border border-stone-200 p-6 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <div className="text-stone-500 text-sm">내 진도</div>
+            <div className="text-2xl font-bold text-stone-800">{done} / {TOTAL} 단어</div>
+          </div>
+          <div className="text-4xl">{done === 0 ? '🌱' : done < TOTAL ? '🌿' : '🌳'}</div>
+        </div>
+        <div className="w-full h-3 bg-stone-100 rounded-full overflow-hidden">
+          <div className="h-full bg-orange-400 transition-all" style={{width: `${(done/TOTAL)*100}%`}}/>
+        </div>
+      </div>
+      <div className="grid grid-cols-5 gap-3 mb-6">
+        {STAGES.map(s => {
+          const stageDone = (WORDS[s.key]||[]).filter(w => progress.words?.[w.word]?.completed).length;
+          const stageTotal = (WORDS[s.key]||[]).length;
+          return (
+            <div key={s.key} className="bg-white rounded-2xl border border-stone-200 p-3 text-center">
+              <div className="w-10 h-10 mx-auto rounded-xl flex items-center justify-center text-xl font-extrabold word-en text-white"
+                   style={{background: s.color}}>{s.key}</div>
+              <div className="text-xs text-stone-500 mt-2">/{s.sound}/</div>
+              <div className="text-xs text-stone-700 mt-1 font-semibold">{stageDone}/{stageTotal}</div>
+            </div>
+          );
+        })}
+      </div>
+      <button onClick={onStart}
+              className="w-full py-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold shadow-md transition">
+        학습 시작하기 →
+      </button>
+      <div className="mt-8 text-center text-xs text-stone-400">
+        Level 1 · 단모음 (a · e · i · o · u) · {TOTAL} 단어 골든샘플 v2
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
+   11) 단계 맵
+   ========================================================= */
+const StageMapView = ({onPickStage, onHome, progress}) => (
+  <div>
+    <TopBar onHome={onHome} title="단계 맵" right="Level 1"/>
+    <div className="max-w-2xl mx-auto px-5 py-6 pop-in">
+      <p className="text-stone-600 mb-5">학습할 단모음을 골라주세요. 처음이라면 <b>a</b>부터 추천해요.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {STAGES.map(s => {
+          const stageWords = WORDS[s.key] || [];
+          const completed = stageWords.filter(w => progress.words?.[w.word]?.completed).length;
+          const pct = (completed/stageWords.length)*100;
+          return (
+            <button key={s.key} onClick={() => onPickStage(s.key)}
+                    className={`text-left bg-white rounded-3xl border border-stone-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition no-select`}>
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-extrabold word-en text-white"
+                     style={{background: s.color}}>{s.key}</div>
+                <div className="flex-1">
+                  <div className="font-bold text-lg text-stone-800">{s.label}</div>
+                  <div className="text-stone-500 text-sm">/{s.sound}/ · {stageWords.length}단어</div>
+                </div>
+                <div className="text-stone-400 text-sm font-semibold">{completed}/{stageWords.length}</div>
+              </div>
+              <div className="mt-3 w-full h-2 bg-stone-100 rounded-full overflow-hidden">
+                <div className="h-full" style={{width: `${pct}%`, background: s.color}}/>
+              </div>
+              <div className="text-xs text-stone-500 mt-3">{s.mouth}</div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+);
+
+/* =========================================================
+   12) 단어 학습
+   ========================================================= */
+const LessonView = ({stageKey, onDone, onHome, setProgress, reports, setReports}) => {
+  const stage = STAGES.find(s => s.key === stageKey);
+  const words = WORDS[stageKey];
+  const [idx, setIdx] = useState(0);
+  const [phase, setPhase] = useState('intro');
+  const [highlight, setHighlight] = useState(-1);
+  const [reportToast, setReportToast] = useState(null);
+
+  const w = words[idx];
+
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const playSlow = async () => {
+    if (isSpeaking) return;
+    setIsSpeaking(true);
+    setHighlight(-1);
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      window.speechSynthesis.cancel();
+      await new Promise(r => setTimeout(r, 150));
+    }
+    for (let i=0;i<w.sounds.length;i++) {
+      setHighlight(i);
+      await new Promise(r => setTimeout(r, 80));
+      await new Promise(resolve => {
+        ensureSpeechAlive();
+        const u = new SpeechSynthesisUtterance(w.sounds[i][0]);
+        u.lang='en-US'; u.rate=0.55;
+        const v = pickEnglishVoice(); if (v) u.voice = v;
+        u.onend = () => setTimeout(resolve, 220);
+        u.onerror = () => resolve();
+        try { window.speechSynthesis.speak(u); }
+        catch { resolve(); }
+      });
+    }
+    setHighlight(-1);
+    setIsSpeaking(false);
+  };
+  const playFast = () => {
+    setIsSpeaking(true);
+    speak(w.word, {rate: 0.95, onend: () => setIsSpeaking(false), onerror: () => setIsSpeaking(false)});
+  };
+
+  const markComplete = () => {
+    setProgress(p => ({...p, words: {...(p.words||{}), [w.word]: {completed:true, ts: Date.now()}}}));
+  };
+  const next = () => {
+    markComplete();
+    if (idx < words.length - 1) { setIdx(idx+1); setPhase('learn'); }
+    else { onDone(); }
+  };
+
+  if (phase === 'intro') {
+    return (
+      <div>
+        <TopBar onHome={onHome} title={stage.label} right={`${idx+1}/${words.length}`}/>
+        <div className="max-w-xl mx-auto px-5 py-8 pop-in">
+          <div className="bg-white rounded-3xl border border-stone-200 p-6 text-center">
+            <div className="text-stone-500 text-sm mb-1">입 모양 가이드</div>
+            <div className="text-2xl font-bold text-stone-800 mb-4">/{stage.sound}/ 소리</div>
+            <div className="w-40 h-40 mx-auto mb-4"><MouthSVG stage={stage.key}/></div>
+            <p className="text-stone-600">{stage.mouth}</p>
+          </div>
+          <button onClick={() => setPhase('learn')}
+                  className="w-full mt-5 py-4 rounded-2xl text-white font-bold text-lg shadow-md transition"
+                  style={{background: stage.color}}>
+            단어 학습 시작 →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <TopBar onHome={onHome} title={stage.label} right={`${idx+1}/${words.length}`}/>
+      <div className="max-w-xl mx-auto px-5 py-6 pop-in">
+        <div className="bg-white rounded-3xl border border-stone-200 p-6 relative">
+          {(() => {
+            const already = reports?.[w.word];
+            const reportImg = () => {
+              setReports(p => ({...(p||{}), [w.word]: {ts: Date.now(), stage: stageKey}}));
+              setReportToast(`"${w.word}" 그림 오류를 신고했어요! 다음에 개선할게요 🙏`);
+              setTimeout(() => setReportToast(null), 2500);
+            };
+            return (
+              <button onClick={reportImg} disabled={!!already}
+                className={`absolute top-3 right-3 text-xs px-2.5 py-1.5 rounded-full transition flex items-center gap-1
+                  ${already ? 'bg-stone-100 text-stone-400' : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200'}`}
+                title={already ? '이미 신고함' : '그림이 단어와 안 맞으면 알려주세요'}>
+                {already ? '✓ 신고됨' : '⚠️ 그림 오류 신고'}
+              </button>
+            );
+          })()}
+          <div className="aspect-square w-48 mx-auto mb-4"><Illustration word={w.word}/></div>
+          <div className="text-center mb-2">
+            <div className="text-5xl font-extrabold word-en text-stone-800">{w.word}</div>
+            <div className="text-stone-500 mt-1">뜻: <b className="text-stone-700">{w.meaning}</b></div>
+          </div>
+          <div className="mt-5">
+            <div className="text-xs text-stone-500 mb-2 text-center">소리 분해</div>
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              {w.sounds.map((s, i) => (
+                <React.Fragment key={i}>
+                  <div className={`transition-all rounded-2xl px-3 py-2 ${highlight===i?'scale-110':''}`}
+                       style={{background: highlight===i ? stage.color : '#F5F5F4', color: highlight===i ? 'white' : '#44403C'}}>
+                    <div className="text-2xl font-extrabold word-en text-center">{s[0]}</div>
+                    <div className="text-xs text-center">/{s[1]}/</div>
+                  </div>
+                  {i < w.sounds.length-1 && <span className="text-stone-400 text-xl">+</span>}
+                </React.Fragment>
+              ))}
+            </div>
+            <div className="text-center mt-4 text-stone-500 text-sm">
+              <span className="px-2 py-1 rounded-lg bg-stone-100">/{w.read}/</span>
+              <span className="mx-2">→ 빠르게 읽어서</span>
+              <span className="px-2 py-1 rounded-lg font-bold" style={{background: stage.color+'22', color: stage.color}}>/{w.fast}/</span>
+            </div>
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <button onClick={playSlow} disabled={isSpeaking}
+                    className={`py-3 rounded-2xl font-semibold transition ${isSpeaking ? 'bg-stone-200 text-stone-400' : 'bg-stone-100 hover:bg-stone-200 text-stone-700'}`}>
+              🐢 느리게 듣기
+            </button>
+            <button onClick={playFast} disabled={isSpeaking}
+                    className={`py-3 rounded-2xl text-white font-semibold transition ${isSpeaking ? 'opacity-70' : 'pulse-ring'}`}
+                    style={{background: stage.color}}>
+              {isSpeaking ? '🔊 재생 중...' : '🔊 빠르게 듣기'}
+            </button>
+          </div>
+        </div>
+        <button onClick={next}
+                className="w-full mt-4 py-4 rounded-2xl bg-stone-800 hover:bg-stone-900 text-white text-lg font-bold transition">
+          {idx === words.length-1 ? '퀴즈 풀러 가기 →' : '다음 단어 →'}
+        </button>
+        {reportToast && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-stone-800 text-white px-5 py-3 rounded-2xl shadow-xl text-sm z-50 pop-in">
+            {reportToast}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
+   13) 퀴즈 (단계당 10문제, 4지선다)
+   ========================================================= */
+const QuizView = ({stageKey, onDone, onHome}) => {
+  const stage = STAGES.find(s => s.key === stageKey);
+  const words = WORDS[stageKey];
+  const [qIdx, setQIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+
+  const question = useMemo(() => {
+    const correct = words[qIdx];
+    const otherKeys = STAGES.filter(s => s.key !== stageKey).map(s => s.key);
+    const otherWords = otherKeys.flatMap(k => WORDS[k]);
+    const pool = [...words.filter(w => w.word !== correct.word), ...otherWords];
+    const distractors = pool.sort(() => Math.random()-0.5).slice(0, 3);
+    const options = [correct, ...distractors].sort(() => Math.random()-0.5);
+    return { correct, options };
+  }, [qIdx, stageKey]);
+
+  const answer = (opt) => {
+    if (feedback) return;
+    const ok = opt.word === question.correct.word;
+    setFeedback({ok, picked: opt.word});
+    if (ok) setScore(s => s+1);
+    setTimeout(() => {
+      setFeedback(null);
+      if (qIdx < words.length-1) setQIdx(qIdx+1);
+      else onDone(score + (ok?1:0));
+    }, 1100);
+  };
+
+  // 새 문제로 넘어갈 때 음성을 들려준다. voices/페이지 인터랙션 타이밍 대응 위해 짧게 지연
+  useEffect(() => {
+    const t = setTimeout(() => speak(question.correct.word, {rate: .9}), 250);
+    return () => clearTimeout(t);
+  }, [qIdx]);
+
+  return (
+    <div>
+      <TopBar onHome={onHome} title="듣고 그림 고르기" right={`${qIdx+1}/${words.length}`}/>
+      <div className="max-w-xl mx-auto px-5 py-6 pop-in">
+        <div className="bg-white rounded-3xl border border-stone-200 p-6 text-center">
+          <div className="text-stone-500 text-sm">들려주는 단어의 그림을 골라보세요</div>
+          <div className="mt-3 mb-5">
+            <button onClick={() => speak(question.correct.word, {rate: .9})}
+                    className="px-5 py-3 rounded-2xl text-white font-semibold shadow-md"
+                    style={{background: stage.color}}>
+              🔊 다시 듣기
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {question.options.map(opt => {
+              const isCorrect = feedback && opt.word === question.correct.word;
+              const isPicked  = feedback && opt.word === feedback.picked;
+              const wrong = isPicked && !feedback.ok;
+              return (
+                <button key={opt.word} onClick={() => answer(opt)}
+                        className={`aspect-square rounded-2xl overflow-hidden border-4 transition
+                          ${isCorrect ? 'border-green-400 ring-4 ring-green-200' : wrong ? 'border-red-400 ring-4 ring-red-200' : 'border-stone-200 hover:border-stone-300'}`}>
+                  <Illustration word={opt.word}/>
+                </button>
+              );
+            })}
+          </div>
+          {feedback && (
+            <div className={`mt-5 text-lg font-bold ${feedback.ok?'text-green-600':'text-red-500'}`}>
+              {feedback.ok ? '잘 들었어요! 🎉' : `정답은 "${question.correct.word}" 였어요.`}
+            </div>
+          )}
+        </div>
+        <div className="mt-4 text-center text-stone-500 text-sm">현재 점수: <b className="text-stone-700">{score}</b> / {words.length}</div>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
+   14) 결과
+   ========================================================= */
+const ResultView = ({stageKey, score, onHome, onAgain, onNext}) => {
+  const stage = STAGES.find(s => s.key === stageKey);
+  const total = WORDS[stageKey].length;
+  const perfect = score === total;
+  const nextStage = STAGES[STAGES.findIndex(s=>s.key===stageKey)+1];
+  return (
+    <div>
+      <TopBar onHome={onHome} title={`${stage.label} 완료`} right=""/>
+      <div className="max-w-xl mx-auto px-5 py-10 text-center pop-in">
+        <div className="text-7xl mb-3">{perfect ? '🏆' : score >= total*0.6 ? '🎖️' : '🌱'}</div>
+        <h2 className="text-3xl font-extrabold text-stone-800">{perfect ? '완벽해요!' : score >= total*0.6 ? '잘했어요!' : '한 번 더 해볼까요?'}</h2>
+        <p className="text-stone-500 mt-2">맞춘 개수: <b className="text-stone-700">{score} / {total}</b></p>
+        <div className="mt-8 grid grid-cols-1 gap-3">
+          {nextStage && (
+            <button onClick={() => onNext(nextStage.key)}
+                    className="py-4 rounded-2xl text-white text-lg font-bold shadow-md"
+                    style={{background: nextStage.color}}>
+              다음 단계 ({nextStage.label}) →
+            </button>
+          )}
+          <button onClick={onAgain} className="py-3 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold">
+            이 단계 다시 학습
+          </button>
+          <button onClick={onHome} className="py-3 rounded-2xl bg-white border border-stone-200 text-stone-600 font-semibold">
+            홈으로
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
+   15) 메인 App
+   ========================================================= */
+const App = () => {
+  const [view, setView] = useState('home');
+  const [stageKey, setStageKey] = useState('a');
+  const [lastScore, setLastScore] = useState(0);
+  const [progress, setProgress] = usePersist('phonics-progress-v2', { words: {} });
+  const [reports, setReports] = usePersist('phonics-image-reports-v1', {});
+  const [voiceWarning, setVoiceWarning] = useState(null);
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) {
+      setVoiceWarning('이 브라우저는 음성 합성을 지원하지 않습니다. Chrome/Edge 사용을 권장합니다.');
+      return;
+    }
+    const load = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        _voicesReady = true;
+        const hasEn = voices.some(v => /^en/i.test(v.lang));
+        if (!hasEn) {
+          setVoiceWarning('이 PC에 영어 음성이 설치되어 있지 않을 수 있어요. Windows 설정 → 시간 및 언어 → 음성 → "음성 추가"에서 영어를 추가해 주세요.');
+        }
+      }
+    };
+    load();
+    window.speechSynthesis.onvoiceschanged = load;
+    // 처음 한 번 깨우기 (Chrome 자동재생 정책 풀기에 도움)
+    try { window.speechSynthesis.resume(); } catch {}
+  }, []);
+  const goHome = () => setView('home');
+  return (
+    <div className="min-h-screen">
+      {voiceWarning && (
+        <div className="bg-amber-50 border-b border-amber-200 text-amber-800 text-sm px-4 py-2 text-center">
+          ⚠️ {voiceWarning}
+        </div>
+      )}
+      {view === 'home' && <HomeView onStart={() => setView('map')} progress={progress}/>}
+      {view === 'map' && <StageMapView onHome={goHome} onPickStage={(k) => { setStageKey(k); setView('lesson'); }} progress={progress}/>}
+      {view === 'lesson' && <LessonView stageKey={stageKey} onHome={goHome} setProgress={setProgress} reports={reports} setReports={setReports} onDone={() => setView('quiz')}/>}
+      {view === 'quiz' && <QuizView stageKey={stageKey} onHome={goHome} onDone={(score) => { setLastScore(score); setView('result'); }}/>}
+      {view === 'result' && <ResultView stageKey={stageKey} score={lastScore} onHome={goHome} onAgain={() => setView('lesson')} onNext={(k) => { setStageKey(k); setView('lesson'); }}/>}
+      <footer className="text-center text-xs text-stone-400 py-6">
+        진짜 쉬운 파닉스 · 골든샘플 v2 · 단모음 {TOTAL}단어
+      </footer>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
