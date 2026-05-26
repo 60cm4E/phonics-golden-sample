@@ -13,17 +13,34 @@ ham = h /흐/ + a /애/ + m /음/
     → 빠르게 읽어서 /햄/
 ```
 
-## 📚 커리큘럼 (22 단계, 134 단어)
+## 📚 커리큘럼 (v8 · 골든샘플)
 
+### 파닉스 본 학습 — 184 단어
 - **Level 1: 단모음** (a / e / i / o / u) — 50 단어
 - **Level 2: 매직 e** (a_e / e_e / i_e / o_e / u_e) — 24 단어
 - **Level 3: 이중자음** (sh / ch / th / ph / wh / ng) — 30 단어
 - **Level 4: 이중모음** (ai_ay / ee / ea / oa / ow / oi_oy) — 30 단어
+- **Level 5: 사이트워드** (1~5군) — 50 단어
+
+### 짧은 독해 — 12 지문 (Module C, NEW v8)
+- Level 1 단모음 5개 지문 (a/e/i/o/u 각 1개)
+- Level 2 매직 e 2개 지문
+- Level 3 이중자음 2개 지문
+- Level 4 이중모음 2개 지문
+- Level 5 사이트워드 1개 지문
+- 전체 듣기 / 문장별 듣기 / 한글 토글 / "다 읽었어요" 진도
+
+### EGU 어휘 — 4 테마 × 5단어 = 20단어 (Module D, NEW v8)
+- 🏠 집 (door, window, bed, chair, clock)
+- 👨‍👩‍👧‍👦 가족 (mom, dad, baby, sister, brother)
+- 🏫 학교 (book, pen, desk, bag, pencil)
+- 🍔 음식 (rice, bread, milk, apple, cake)
+- 단어별 발음 듣기 + 학습 완료 체크
 
 ## 🛠️ 사용 방법
 
 별도 빌드 없음. `index.html`을 브라우저로 더블클릭하면 실행됩니다.
-온라인 배포: [Vercel 자동 배포 URL]
+온라인: <https://phonics-golden-sample.vercel.app/>
 
 ## 🔧 기술 스택
 
@@ -32,7 +49,7 @@ ham = h /흐/ + a /애/ + m /음/
 - Babel Standalone (JSX 트랜스파일)
 - Web Speech API (TTS)
 - localStorage (진도 저장)
-- 자체 인라인 SVG 일러스트 134개
+- 자체 인라인 SVG 일러스트 약 150개 + 이모지 폴백
 
 ## 📝 주요 기능
 
@@ -41,6 +58,9 @@ ham = h /흐/ + a /애/ + m /음/
 - 4지선다 그림 매칭 퀴즈
 - 단계별 진도 추적 (localStorage)
 - ⚠️ 학생 직접 이미지 오류 신고 버튼
+- 📊 학습 통계 대시보드 (7일 그래프 · Level별 진도)
+- 📖 짧은 독해 (전체 듣기 / 문장별 듣기 / 한글 토글)
+- 📚 EGU 어휘 (4 테마, 발음 + 학습 체크)
 
 ## 🤝 자료 출처
 

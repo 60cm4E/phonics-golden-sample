@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>진짜 쉬운 파닉스 · 단모음 학습 v2</title>
+<title>진짜 쉬운 파닉스 · Level 1~5 · 독해 · EGU 어휘</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -340,6 +340,171 @@ const WORDS = {
     { word:'really', meaning:'정말로', sounds:[['r','r'], ['ea','이'], ['lly','얼리']], read:'리얼리', fast:'리얼리' },
   ],
 };
+
+/* =========================================================
+   2.5) 짧은 독해 지문 (C) — 12 passages, 학습한 단어 위주
+   ========================================================= */
+const READINGS = [
+  // ─── Level 1: 단모음 (5 지문) ───
+  { id:'r1', title:'My Cat', subtitle:'단모음 a', emoji:'🐱', color:'#FF7A45', level:1,
+    sentences: [
+      { en:'I have a cat.',         ko:'나는 고양이가 있어요.' },
+      { en:'My cat is fat.',        ko:'내 고양이는 뚱뚱해요.' },
+      { en:'The cat has a hat.',    ko:'고양이는 모자를 갖고 있어요.' },
+      { en:'The cat can run.',      ko:'고양이는 달릴 수 있어요.' },
+      { en:'I like my cat.',        ko:'나는 내 고양이를 좋아해요.' },
+    ]
+  },
+  { id:'r2', title:'Red Hen', subtitle:'단모음 e', emoji:'🐔', color:'#F59E0B', level:1,
+    sentences: [
+      { en:'I have a hen.',         ko:'나는 암탉이 있어요.' },
+      { en:'The hen is red.',       ko:'그 암탉은 빨개요.' },
+      { en:'The hen is in a pen.',  ko:'그 암탉은 우리 안에 있어요.' },
+      { en:'The hen has ten eggs.', ko:'그 암탉은 알을 열 개 갖고 있어요.' },
+      { en:'I like my red hen.',    ko:'나는 내 빨간 암탉을 좋아해요.' },
+    ]
+  },
+  { id:'r3', title:'Big Pig', subtitle:'단모음 i', emoji:'🐷', color:'#16A34A', level:1,
+    sentences: [
+      { en:'I see a pig.',           ko:'나는 돼지를 봐요.' },
+      { en:'The pig is big.',        ko:'그 돼지는 커요.' },
+      { en:'The pig is in the mud.', ko:'그 돼지는 진흙 속에 있어요.' },
+      { en:'A kid runs to the pig.', ko:'한 아이가 돼지에게 달려가요.' },
+      { en:'The kid likes the pig.', ko:'그 아이는 돼지를 좋아해요.' },
+    ]
+  },
+  { id:'r4', title:'The Fox in the Box', subtitle:'단모음 o', emoji:'🦊', color:'#2563EB', level:1,
+    sentences: [
+      { en:'I see a box.',           ko:'나는 상자를 봐요.' },
+      { en:'The box is hot.',        ko:'그 상자는 뜨거워요.' },
+      { en:'In the box is a fox.',   ko:'상자 안에 여우가 있어요.' },
+      { en:'The fox can hop.',       ko:'여우는 깡충 뛸 수 있어요.' },
+      { en:'The fox is not sad.',    ko:'여우는 슬프지 않아요.' },
+    ]
+  },
+  { id:'r5', title:'The Hot Sun', subtitle:'단모음 u', emoji:'☀️', color:'#9333EA', level:1,
+    sentences: [
+      { en:'The sun is up.',          ko:'해가 떴어요.' },
+      { en:'The sun is hot.',         ko:'해가 뜨거워요.' },
+      { en:'I run to my mom.',        ko:'나는 엄마에게 달려가요.' },
+      { en:'Mom has a cup.',          ko:'엄마는 컵을 갖고 있어요.' },
+      { en:'We have fun in the sun.', ko:'우리는 햇볕 아래서 재미있게 놀아요.' },
+    ]
+  },
+  // ─── Level 2: 매직 e (2 지문) ───
+  { id:'r6', title:'My Bike', subtitle:'매직 e: i_e', emoji:'🚲', color:'#059669', level:2,
+    sentences: [
+      { en:'I have a bike.',          ko:'나는 자전거가 있어요.' },
+      { en:'I like to ride.',         ko:'나는 타는 것을 좋아해요.' },
+      { en:'I ride my bike.',         ko:'나는 자전거를 타요.' },
+      { en:'My bike is red.',         ko:'내 자전거는 빨개요.' },
+      { en:'Mom can see me ride.',    ko:'엄마는 내가 타는 것을 볼 수 있어요.' },
+    ]
+  },
+  { id:'r7', title:'Pete and the Cake', subtitle:'매직 e: a_e/e_e', emoji:'🎂', color:'#EF4444', level:2,
+    sentences: [
+      { en:'Pete is a kid.',          ko:'Pete는 아이예요.' },
+      { en:'Mom can make a cake.',    ko:'엄마는 케이크를 만들 수 있어요.' },
+      { en:'The cake is on a plate.', ko:'케이크는 접시 위에 있어요.' },
+      { en:'Pete likes the cake.',    ko:'Pete는 케이크를 좋아해요.' },
+      { en:'Pete eats the cake.',     ko:'Pete는 케이크를 먹어요.' },
+    ]
+  },
+  // ─── Level 3: 이중자음 (2 지문) ───
+  { id:'r8', title:'A Big Fish', subtitle:'이중자음 sh', emoji:'🐟', color:'#0E7490', level:3,
+    sentences: [
+      { en:'I see a fish.',           ko:'나는 물고기를 봐요.' },
+      { en:'The fish is big.',        ko:'그 물고기는 커요.' },
+      { en:'It can splash.',          ko:'그것은 물을 튀길 수 있어요.' },
+      { en:'I have a dish.',          ko:'나는 접시가 있어요.' },
+      { en:'The fish is in the dish.',ko:'그 물고기는 접시 안에 있어요.' },
+    ]
+  },
+  { id:'r9', title:'Lunch Time', subtitle:'이중자음 ch', emoji:'🥪', color:'#0D9488', level:3,
+    sentences: [
+      { en:'It is lunch time.',       ko:'점심 시간이에요.' },
+      { en:'I have a chip.',          ko:'나는 감자칩이 있어요.' },
+      { en:'My chin is wet.',         ko:'내 턱이 젖었어요.' },
+      { en:'I sit on a bench.',       ko:'나는 벤치에 앉아요.' },
+      { en:'Lunch is fun!',           ko:'점심은 재미있어요!' },
+    ]
+  },
+  // ─── Level 4: 이중모음 (2 지문) ───
+  { id:'r10', title:'The Green Tree', subtitle:'이중모음 ee', emoji:'🌳', color:'#EA580C', level:4,
+    sentences: [
+      { en:'I see a tree.',            ko:'나는 나무를 봐요.' },
+      { en:'The tree is green.',       ko:'그 나무는 초록색이에요.' },
+      { en:'A bee is on the tree.',    ko:'벌 한 마리가 나무에 있어요.' },
+      { en:'I can see three bees.',    ko:'나는 벌 세 마리를 볼 수 있어요.' },
+      { en:'I run from the bees.',     ko:'나는 벌들로부터 도망가요.' },
+    ]
+  },
+  { id:'r11', title:'Snow Day', subtitle:'이중모음 ow', emoji:'❄️', color:'#0EA5E9', level:4,
+    sentences: [
+      { en:'I look out my window.',    ko:'나는 창밖을 봐요.' },
+      { en:'I see snow!',              ko:'나는 눈을 봐요!' },
+      { en:'The snow is white.',       ko:'그 눈은 하얘요.' },
+      { en:'My dog is in the snow.',   ko:'내 강아지가 눈 속에 있어요.' },
+      { en:'I want to play in snow.',  ko:'나는 눈 속에서 놀고 싶어요.' },
+    ]
+  },
+  // ─── Level 5: 사이트워드 (1 지문) ───
+  { id:'r12', title:'My Family', subtitle:'사이트워드', emoji:'👨‍👩‍👧', color:'#BE185D', level:5,
+    sentences: [
+      { en:'This is my mom.',          ko:'이 사람은 우리 엄마예요.' },
+      { en:'That is my dad.',          ko:'저 사람은 우리 아빠예요.' },
+      { en:'He is my brother.',        ko:'그는 내 형/오빠/남동생이에요.' },
+      { en:'She is my sister.',        ko:'그녀는 내 언니/누나/여동생이에요.' },
+      { en:'We are a family.',         ko:'우리는 가족이에요.' },
+    ]
+  },
+];
+
+/* =========================================================
+   2.6) EGU 어휘 모듈 (D) — 4 테마 × 5 단어 = 20단어
+   ========================================================= */
+const EGU_THEMES = [
+  { id:'home', label:'집', emoji:'🏠', color:'#3B82F6',
+    desc:'우리 집에 있는 것들',
+    words: [
+      { en:'door',   ko:'문',     emoji:'🚪', fast:'도어' },
+      { en:'window', ko:'창문',   emoji:'🪟', fast:'윈도우' },
+      { en:'bed',    ko:'침대',   emoji:'🛏️', fast:'베드' },
+      { en:'chair',  ko:'의자',   emoji:'🪑', fast:'체어' },
+      { en:'clock',  ko:'시계',   emoji:'🕐', fast:'클락' },
+    ]
+  },
+  { id:'family', label:'가족', emoji:'👨‍👩‍👧‍👦', color:'#EC4899',
+    desc:'우리 가족',
+    words: [
+      { en:'mom',     ko:'엄마',             emoji:'👩', fast:'마음' },
+      { en:'dad',     ko:'아빠',             emoji:'👨', fast:'대드' },
+      { en:'baby',    ko:'아기',             emoji:'👶', fast:'베이비' },
+      { en:'sister',  ko:'언니/누나/여동생', emoji:'👧', fast:'씨스터' },
+      { en:'brother', ko:'오빠/형/남동생',   emoji:'👦', fast:'브라더' },
+    ]
+  },
+  { id:'school', label:'학교', emoji:'🏫', color:'#10B981',
+    desc:'학교에서 쓰는 것들',
+    words: [
+      { en:'book',    ko:'책',     emoji:'📖', fast:'북' },
+      { en:'pen',     ko:'펜',     emoji:'🖊️', fast:'펜' },
+      { en:'desk',    ko:'책상',   emoji:'🪟', fast:'데스크' },
+      { en:'bag',     ko:'가방',   emoji:'🎒', fast:'백' },
+      { en:'pencil',  ko:'연필',   emoji:'✏️', fast:'펜슬' },
+    ]
+  },
+  { id:'food', label:'음식', emoji:'🍔', color:'#F97316',
+    desc:'우리가 먹는 음식',
+    words: [
+      { en:'rice',   ko:'쌀/밥',  emoji:'🍚', fast:'롸이스' },
+      { en:'bread',  ko:'빵',     emoji:'🍞', fast:'브뤠드' },
+      { en:'milk',   ko:'우유',   emoji:'🥛', fast:'밀크' },
+      { en:'apple',  ko:'사과',   emoji:'🍎', fast:'애플' },
+      { en:'cake',   ko:'케이크', emoji:'🍰', fast:'케이크' },
+    ]
+  },
+];
 
 /* =========================================================
    3) 이모지 폴백 매핑
@@ -2130,8 +2295,10 @@ const TOTAL = Object.values(WORDS).reduce((a,b)=>a+b.length,0);
 /* =========================================================
    10) 홈
    ========================================================= */
-const HomeView = ({onStart, progress, onReports, onStats}) => {
+const HomeView = ({onStart, progress, onReports, onStats, onReading, onEgu}) => {
   const done = Object.values(progress.words||{}).filter(v => v.completed).length;
+  const readingsDone = Object.values(progress.readings||{}).filter(v => v.read).length;
+  const eguDone = Object.values(progress.egu||{}).filter(v => v.learned).length;
   return (
     <div className="max-w-2xl mx-auto px-5 py-8 pop-in">
       <div className="text-center mb-8">
@@ -2167,8 +2334,23 @@ const HomeView = ({onStart, progress, onReports, onStats}) => {
       </div>
       <button onClick={onStart}
               className="w-full py-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold shadow-md transition">
-        학습 시작하기 →
+        파닉스 학습 시작하기 →
       </button>
+
+      <div className="grid grid-cols-2 gap-3 mt-3">
+        <button onClick={onReading}
+                className="py-4 rounded-2xl bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 text-sm font-bold transition flex flex-col items-center justify-center gap-1">
+          <span className="text-2xl">📖</span>
+          <span>짧은 독해</span>
+          <span className="text-xs font-normal text-stone-500">{readingsDone}/{READINGS.length}</span>
+        </button>
+        <button onClick={onEgu}
+                className="py-4 rounded-2xl bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 text-sm font-bold transition flex flex-col items-center justify-center gap-1">
+          <span className="text-2xl">📚</span>
+          <span>EGU 어휘</span>
+          <span className="text-xs font-normal text-stone-500">{eguDone}/20</span>
+        </button>
+      </div>
 
       <div className="grid grid-cols-2 gap-3 mt-3">
         <button onClick={onStats}
@@ -2182,7 +2364,7 @@ const HomeView = ({onStart, progress, onReports, onStats}) => {
       </div>
 
       <div className="mt-8 text-center text-xs text-stone-400">
-        Level 1~5 · {TOTAL} 단어 · 골든샘플 v7
+        Level 1~5 · {TOTAL} 단어 · 독해 12 · EGU 20 · 골든샘플 v8
       </div>
     </div>
   );
@@ -2624,13 +2806,302 @@ const StatsView = ({progress, onHome}) => {
 };
 
 /* =========================================================
+   14.7) 짧은 독해 (C) — 목록 화면
+   ========================================================= */
+const ReadingListView = ({onPick, onHome, progress}) => {
+  const readDone = progress?.readings || {};
+  const doneCount = Object.values(readDone).filter(v => v.read).length;
+  return (
+    <div>
+      <TopBar onHome={onHome} title="📖 짧은 독해" right={`${doneCount}/${READINGS.length}`}/>
+      <div className="max-w-2xl mx-auto px-5 py-6 pop-in">
+        <p className="text-stone-600 mb-5">배운 단어로 만든 짧은 글이에요. 소리 내어 읽어봐요.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {READINGS.map(r => {
+            const done = !!readDone[r.id]?.read;
+            return (
+              <button key={r.id} onClick={() => onPick(r.id)}
+                      className="text-left bg-white rounded-3xl border border-stone-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition no-select">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+                       style={{background: r.color+'22'}}>{r.emoji}</div>
+                  <div className="flex-1">
+                    <div className="font-bold text-lg text-stone-800 word-en">{r.title}</div>
+                    <div className="text-stone-500 text-sm">{r.subtitle}</div>
+                  </div>
+                  {done && <div className="text-2xl">✅</div>}
+                </div>
+                <div className="text-xs text-stone-400 mt-3">{r.sentences.length}문장 · Level {r.level}</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
+   14.8) 짧은 독해 (C) — 상세 읽기 화면
+   ========================================================= */
+const ReadingDetailView = ({readingId, onBack, onHome, progress, setProgress}) => {
+  const reading = READINGS.find(r => r.id === readingId);
+  const [showKo, setShowKo] = useState(true);
+  const [playingIdx, setPlayingIdx] = useState(-1);
+  const [autoPlaying, setAutoPlaying] = useState(false);
+  const isReadDone = !!progress?.readings?.[readingId]?.read;
+
+  const playOne = (idx) => {
+    if (playingIdx === idx) {
+      window.speechSynthesis.cancel();
+      setPlayingIdx(-1);
+      return;
+    }
+    setPlayingIdx(idx);
+    speak(reading.sentences[idx].en, {
+      rate: 0.85,
+      onend: () => setPlayingIdx(-1),
+      onerror: () => setPlayingIdx(-1),
+    });
+  };
+
+  const playAll = () => {
+    if (autoPlaying) {
+      window.speechSynthesis.cancel();
+      setAutoPlaying(false);
+      setPlayingIdx(-1);
+      return;
+    }
+    setAutoPlaying(true);
+    let i = 0;
+    const next = () => {
+      if (i >= reading.sentences.length) {
+        setAutoPlaying(false);
+        setPlayingIdx(-1);
+        return;
+      }
+      setPlayingIdx(i);
+      speak(reading.sentences[i].en, {
+        rate: 0.85,
+        onend: () => { i++; setTimeout(next, 350); },
+        onerror: () => { i++; setTimeout(next, 350); },
+      });
+    };
+    next();
+  };
+
+  const markRead = () => {
+    setProgress(p => ({
+      ...p,
+      readings: { ...(p.readings||{}), [readingId]: { read: true, ts: Date.now() } }
+    }));
+  };
+
+  return (
+    <div>
+      <TopBar onHome={onHome} title={reading.title} right={reading.subtitle}/>
+      <div className="max-w-2xl mx-auto px-5 py-6 pop-in">
+        <button onClick={onBack}
+                className="text-sm text-stone-500 hover:text-stone-800 mb-4 flex items-center gap-1">
+          ← 독해 목록으로
+        </button>
+
+        <div className="bg-white rounded-3xl border border-stone-200 p-6 mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl"
+                   style={{background: reading.color+'22'}}>{reading.emoji}</div>
+              <div>
+                <div className="text-2xl font-extrabold text-stone-800 word-en">{reading.title}</div>
+                <div className="text-stone-500 text-sm">{reading.subtitle}</div>
+              </div>
+            </div>
+            <button onClick={() => setShowKo(v => !v)}
+                    className="text-xs px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700">
+              {showKo ? '한글 숨기기' : '한글 보기'}
+            </button>
+          </div>
+
+          <button onClick={playAll}
+                  className="w-full py-3 rounded-2xl text-white font-bold text-base mb-5 transition shadow-sm"
+                  style={{background: autoPlaying ? '#94A3B8' : reading.color}}>
+            {autoPlaying ? '⏸ 멈추기' : '▶ 전체 듣기 (전부 읽어줘요)'}
+          </button>
+
+          <div className="space-y-3">
+            {reading.sentences.map((s, i) => (
+              <div key={i}
+                   className={`rounded-2xl border p-4 transition ${
+                     playingIdx === i ? 'border-orange-400 bg-orange-50 pulse-ring' : 'border-stone-200 bg-stone-50/50'
+                   }`}>
+                <div className="flex items-start gap-3">
+                  <div className="text-xs font-bold text-stone-400 w-5 pt-1">{i+1}</div>
+                  <div className="flex-1">
+                    <div className="text-lg font-semibold text-stone-800 word-en leading-relaxed">{s.en}</div>
+                    {showKo && <div className="text-sm text-stone-500 mt-1">{s.ko}</div>}
+                  </div>
+                  <button onClick={() => playOne(i)}
+                          className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white transition"
+                          style={{background: playingIdx === i ? '#94A3B8' : reading.color}}>
+                    {playingIdx === i ? '⏸' : '🔊'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button onClick={markRead}
+                disabled={isReadDone}
+                className={`w-full py-4 rounded-2xl text-lg font-bold transition shadow-sm ${
+                  isReadDone
+                    ? 'bg-stone-100 text-stone-400'
+                    : 'bg-green-500 hover:bg-green-600 text-white'
+                }`}>
+          {isReadDone ? '✅ 다 읽었어요' : '✅ 다 읽었어요 (체크하기)'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
+   14.9) EGU 어휘 (D) — 테마 목록
+   ========================================================= */
+const EguListView = ({onPick, onHome, progress}) => {
+  const eguDone = progress?.egu || {};
+  return (
+    <div>
+      <TopBar onHome={onHome} title="📚 EGU 어휘" right={`${Object.keys(eguDone).filter(k=>eguDone[k].learned).length}/20`}/>
+      <div className="max-w-2xl mx-auto px-5 py-6 pop-in">
+        <p className="text-stone-600 mb-5">주제별로 묶은 기본 어휘예요. 4개 테마, 각 5단어.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {EGU_THEMES.map(t => {
+            const done = t.words.filter(w => eguDone[w.en]?.learned).length;
+            return (
+              <button key={t.id} onClick={() => onPick(t.id)}
+                      className="text-left bg-white rounded-3xl border border-stone-200 p-6 hover:shadow-md hover:-translate-y-0.5 transition no-select">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl"
+                       style={{background: t.color+'22'}}>{t.emoji}</div>
+                  <div className="flex-1">
+                    <div className="font-extrabold text-xl text-stone-800">{t.label}</div>
+                    <div className="text-stone-500 text-sm">{t.desc}</div>
+                  </div>
+                </div>
+                <div className="flex justify-between text-xs text-stone-500 mb-1">
+                  <span>진도</span>
+                  <span>{done}/{t.words.length}</span>
+                </div>
+                <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
+                  <div className="h-full transition-all" style={{width:`${(done/t.words.length)*100}%`, background: t.color}}/>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
+   14.10) EGU 어휘 (D) — 테마 상세 화면
+   ========================================================= */
+const EguThemeView = ({themeId, onBack, onHome, progress, setProgress}) => {
+  const theme = EGU_THEMES.find(t => t.id === themeId);
+  const [playingWord, setPlayingWord] = useState(null);
+  const eguDone = progress?.egu || {};
+
+  const playWord = (w) => {
+    if (playingWord === w.en) {
+      window.speechSynthesis.cancel();
+      setPlayingWord(null);
+      return;
+    }
+    setPlayingWord(w.en);
+    speak(w.en, { rate: 0.85, onend: () => setPlayingWord(null), onerror: () => setPlayingWord(null) });
+  };
+
+  const toggleLearned = (en) => {
+    setProgress(p => {
+      const e = { ...(p.egu||{}) };
+      if (e[en]?.learned) delete e[en];
+      else e[en] = { learned: true, ts: Date.now() };
+      return { ...p, egu: e };
+    });
+  };
+
+  const done = theme.words.filter(w => eguDone[w.en]?.learned).length;
+
+  return (
+    <div>
+      <TopBar onHome={onHome} title={`📚 ${theme.label}`} right={`${done}/${theme.words.length}`}/>
+      <div className="max-w-2xl mx-auto px-5 py-6 pop-in">
+        <button onClick={onBack}
+                className="text-sm text-stone-500 hover:text-stone-800 mb-4 flex items-center gap-1">
+          ← 테마 목록으로
+        </button>
+
+        <div className="bg-white rounded-3xl border border-stone-200 p-6 mb-4">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl"
+                 style={{background: theme.color+'22'}}>{theme.emoji}</div>
+            <div>
+              <div className="text-2xl font-extrabold text-stone-800">{theme.label}</div>
+              <div className="text-stone-500 text-sm">{theme.desc}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {theme.words.map(w => {
+            const learned = !!eguDone[w.en]?.learned;
+            return (
+              <div key={w.en}
+                   className={`rounded-2xl border p-4 transition ${
+                     learned ? 'bg-green-50 border-green-300' : 'bg-white border-stone-200'
+                   }`}>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl flex-shrink-0"
+                       style={{background: theme.color+'22'}}>{w.emoji}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xl font-extrabold text-stone-800 word-en">{w.en}</div>
+                    <div className="text-stone-600 text-sm">{w.ko}</div>
+                    <div className="text-stone-400 text-xs mt-0.5">[{w.fast}]</div>
+                  </div>
+                  <button onClick={() => playWord(w)}
+                          className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white text-xl transition"
+                          style={{background: playingWord === w.en ? '#94A3B8' : theme.color}}>
+                    {playingWord === w.en ? '⏸' : '🔊'}
+                  </button>
+                  <button onClick={() => toggleLearned(w.en)}
+                          className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-xl transition border-2 ${
+                            learned ? 'bg-green-500 text-white border-green-500' : 'bg-white border-stone-300 text-stone-300 hover:border-green-400 hover:text-green-400'
+                          }`}
+                          title={learned ? '학습 완료 (취소하려면 클릭)' : '학습 완료 체크'}>
+                    ✓
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
    15) 메인 App
    ========================================================= */
 const App = () => {
   const [view, setView] = useState('home');
   const [stageKey, setStageKey] = useState('a');
   const [lastScore, setLastScore] = useState(0);
-  const [progress, setProgress] = usePersist('phonics-progress-v2', { words: {} });
+  const [selectedReading, setSelectedReading] = useState(null);
+  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [progress, setProgress] = usePersist('phonics-progress-v2', { words: {}, readings: {}, egu: {} });
   const [reports, setReports] = usePersist('phonics-image-reports-v1', {});
   const [voiceWarning, setVoiceWarning] = useState(null);
   useEffect(() => {
@@ -2661,15 +3132,27 @@ const App = () => {
           ⚠️ {voiceWarning}
         </div>
       )}
-      {view === 'home' && <HomeView onStart={() => setView('map')} progress={progress} onReports={() => setView('reports')} onStats={() => setView('stats')}/>}
+      {view === 'home' && <HomeView onStart={() => setView('map')} progress={progress}
+                                    onReports={() => setView('reports')} onStats={() => setView('stats')}
+                                    onReading={() => setView('reading')} onEgu={() => setView('egu')}/>}
       {view === 'map' && <StageMapView onHome={goHome} onPickStage={(k) => { setStageKey(k); setView('lesson'); }} progress={progress}/>}
       {view === 'lesson' && <LessonView stageKey={stageKey} onHome={goHome} setProgress={setProgress} reports={reports} setReports={setReports} onDone={() => setView('quiz')}/>}
       {view === 'quiz' && <QuizView stageKey={stageKey} onHome={goHome} onDone={(score) => { setLastScore(score); setView('result'); }}/>}
       {view === 'result' && <ResultView stageKey={stageKey} score={lastScore} onHome={goHome} onAgain={() => setView('lesson')} onNext={(k) => { setStageKey(k); setView('lesson'); }}/>}
       {view === 'reports' && <ReportsView reports={reports} setReports={setReports} onHome={goHome}/>}
       {view === 'stats' && <StatsView progress={progress} onHome={goHome}/>}
+      {view === 'reading' && <ReadingListView onHome={goHome} progress={progress}
+                                              onPick={(id) => { setSelectedReading(id); setView('reading-detail'); }}/>}
+      {view === 'reading-detail' && <ReadingDetailView readingId={selectedReading} onHome={goHome}
+                                                       onBack={() => setView('reading')}
+                                                       progress={progress} setProgress={setProgress}/>}
+      {view === 'egu' && <EguListView onHome={goHome} progress={progress}
+                                      onPick={(id) => { setSelectedTheme(id); setView('egu-theme'); }}/>}
+      {view === 'egu-theme' && <EguThemeView themeId={selectedTheme} onHome={goHome}
+                                             onBack={() => setView('egu')}
+                                             progress={progress} setProgress={setProgress}/>}
       <footer className="text-center text-xs text-stone-400 py-6">
-        진짜 쉬운 파닉스 · 골든샘플 v7 · {TOTAL}단어
+        진짜 쉬운 파닉스 · 골든샘플 v8 · {TOTAL}단어 · 독해 12 · EGU 20
       </footer>
     </div>
   );
