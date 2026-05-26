@@ -461,49 +461,1222 @@ const READINGS = [
 ];
 
 /* =========================================================
-   2.6) EGU 어휘 모듈 (D) — 4 테마 × 5 단어 = 20단어
+   2.6) EGU 어휘 모듈 (D) — 55 Units × ~20 단어 = 1,102 단어
+        (책 「EGU 영단어 & 품사」 Unit 01~55)
    ========================================================= */
-const EGU_THEMES = [
-  { id:'home', label:'집', emoji:'🏠', color:'#3B82F6',
-    desc:'우리 집에 있는 것들',
-    words: [
-      { en:'door',   ko:'문',     emoji:'🚪', fast:'도어' },
-      { en:'window', ko:'창문',   emoji:'🪟', fast:'윈도우' },
-      { en:'bed',    ko:'침대',   emoji:'🛏️', fast:'베드' },
-      { en:'chair',  ko:'의자',   emoji:'🪑', fast:'체어' },
-      { en:'clock',  ko:'시계',   emoji:'🕐', fast:'클락' },
-    ]
-  },
-  { id:'family', label:'가족', emoji:'👨‍👩‍👧‍👦', color:'#EC4899',
-    desc:'우리 가족',
-    words: [
-      { en:'mom',     ko:'엄마',             emoji:'👩', fast:'마음' },
-      { en:'dad',     ko:'아빠',             emoji:'👨', fast:'대드' },
-      { en:'baby',    ko:'아기',             emoji:'👶', fast:'베이비' },
-      { en:'sister',  ko:'언니/누나/여동생', emoji:'👧', fast:'씨스터' },
-      { en:'brother', ko:'오빠/형/남동생',   emoji:'👦', fast:'브라더' },
-    ]
-  },
-  { id:'school', label:'학교', emoji:'🏫', color:'#10B981',
-    desc:'학교에서 쓰는 것들',
-    words: [
-      { en:'book',    ko:'책',     emoji:'📖', fast:'북' },
-      { en:'pen',     ko:'펜',     emoji:'🖊️', fast:'펜' },
-      { en:'desk',    ko:'책상',   emoji:'🪟', fast:'데스크' },
-      { en:'bag',     ko:'가방',   emoji:'🎒', fast:'백' },
-      { en:'pencil',  ko:'연필',   emoji:'✏️', fast:'펜슬' },
-    ]
-  },
-  { id:'food', label:'음식', emoji:'🍔', color:'#F97316',
-    desc:'우리가 먹는 음식',
-    words: [
-      { en:'rice',   ko:'쌀/밥',  emoji:'🍚', fast:'롸이스' },
-      { en:'bread',  ko:'빵',     emoji:'🍞', fast:'브뤠드' },
-      { en:'milk',   ko:'우유',   emoji:'🥛', fast:'밀크' },
-      { en:'apple',  ko:'사과',   emoji:'🍎', fast:'애플' },
-      { en:'cake',   ko:'케이크', emoji:'🍰', fast:'케이크' },
-    ]
-  },
+const EGU_UNITS = [
+  { id:'u01', num:1, title:'Unit 01', desc:'집 1 — 거실/방', words:[
+    { en:'knock', ko:'(문을) 두드리다, 노크하다; 노크 소리' },
+    { en:'door', ko:'문' },
+    { en:'window', ko:'창문' },
+    { en:'clean', ko:'깨끗한; 닦다, 청소하다' },
+    { en:'dirty', ko:'더러운, 지저분한' },
+    { en:'room', ko:'방' },
+    { en:'living room', ko:'거실' },
+    { en:'bedroom', ko:'침실' },
+    { en:'bathroom', ko:'욕실' },
+    { en:'kitchen', ko:'부엌, 주방' },
+    { en:'television', ko:'텔레비전' },
+    { en:'telephone', ko:'전화, 전화기' },
+    { en:'table', ko:'탁자, 식탁' },
+    { en:'newspaper', ko:'신문' },
+    { en:'clock', ko:'시계' },
+    { en:'curtain', ko:'커튼' },
+    { en:'key', ko:'열쇠' },
+    { en:'vase', ko:'꽃병' },
+    { en:'umbrella', ko:'우산' },
+    { en:'roof', ko:'지붕' },
+  ]},
+  { id:'u02', num:2, title:'Unit 02', desc:'욕실/주방', words:[
+    { en:'mirror', ko:'거울' },
+    { en:'soap', ko:'비누' },
+    { en:'shampoo', ko:'샴푸; 머리 감기' },
+    { en:'brush', ko:'솔질을 하다; 붓' },
+    { en:'toothbrush', ko:'칫솔' },
+    { en:'toothpaste', ko:'치약' },
+    { en:'shower', ko:'샤워(하기); 샤워기' },
+    { en:'towel', ko:'수건' },
+    { en:'break', ko:'깨다, 깨지다; 고장 내다; (짧은) 휴식' },
+    { en:'use', ko:'사용하다, 이용하다; 사용, 이용' },
+    { en:'spoon', ko:'숟가락' },
+    { en:'fork', ko:'포크' },
+    { en:'knife', ko:'칼, 나이프' },
+    { en:'chopstick', ko:'젓가락 (한 짝)' },
+    { en:'plate', ko:'접시, 그릇' },
+    { en:'cup', ko:'컵' },
+    { en:'glass', ko:'유리; 유리잔; 안경' },
+    { en:'jar', ko:'(꿀 등을 담는) 병; 단지, 항아리' },
+    { en:'pan', ko:'(손잡이가 달린 얕은) 냄비, 팬' },
+    { en:'refrigerator', ko:'냉장고' },
+  ]},
+  { id:'u03', num:3, title:'Unit 03', desc:'침실/방', words:[
+    { en:'bed', ko:'침대' },
+    { en:'pillow', ko:'베개' },
+    { en:'blanket', ko:'담요, 이불' },
+    { en:'lamp', ko:'램프, 등' },
+    { en:'closet', ko:'벽장' },
+    { en:'dry', ko:'마르다, 말리다; 마른, 건조한' },
+    { en:'wet', ko:'젖은' },
+    { en:'cover', ko:'덮다, 씌우다' },
+    { en:'fan', ko:'선풍기, 부채' },
+    { en:'air conditioner', ko:'에어컨' },
+    { en:'desk', ko:'책상' },
+    { en:'chair', ko:'의자' },
+    { en:'drawer', ko:'서랍' },
+    { en:'computer', ko:'컴퓨터' },
+    { en:'bookshelf', ko:'책장' },
+    { en:'lock', ko:'잠그다' },
+    { en:'toy', ko:'장난감' },
+    { en:'doll', ko:'인형' },
+    { en:'box', ko:'상자' },
+    { en:'wall', ko:'벽, 담' },
+  ]},
+  { id:'u04', num:4, title:'Unit 04', desc:'의복/옷', words:[
+    { en:'clothes', ko:'옷, 의복' },
+    { en:'shirt', ko:'셔츠' },
+    { en:'pants', ko:'바지' },
+    { en:'jeans', ko:'청바지' },
+    { en:'skirt', ko:'치마' },
+    { en:'dress', ko:'드레스, 원피스' },
+    { en:'sweater', ko:'스웨터' },
+    { en:'jacket', ko:'재킷, (짧은) 상의' },
+    { en:'tie', ko:'넥타이' },
+    { en:'wear', ko:'입고[신고/쓰고] 있다' },
+    { en:'new', ko:'새, 새로운' },
+    { en:'old', ko:'늙은, 낡은, 오래된' },
+    { en:'shoes', ko:'신발' },
+    { en:'boots', ko:'장화, 부츠' },
+    { en:'socks', ko:'양말' },
+    { en:'button', ko:'단추' },
+    { en:'pocket', ko:'주머니' },
+    { en:'glove', ko:'장갑' },
+    { en:'scarf', ko:'스카프, 목도리' },
+    { en:'ring', ko:'반지; (종을) 울리다, (종이) 울리다' },
+  ]},
+  { id:'u05', num:5, title:'Unit 05', desc:'가족', words:[
+    { en:'family', ko:'가족' },
+    { en:'father', ko:'아버지' },
+    { en:'dad', ko:'아빠' },
+    { en:'mother', ko:'어머니' },
+    { en:'mom', ko:'엄마' },
+    { en:'brother', ko:'형, 오빠, 남동생' },
+    { en:'sister', ko:'언니, 누나, 여동생' },
+    { en:'grandfather', ko:'할아버지' },
+    { en:'grandmother', ko:'할머니' },
+    { en:'parents', ko:'부모' },
+    { en:'grandparents', ko:'조부모 ((외)할아버지, (외)할머니)' },
+    { en:'grandchild', ko:'손자, 손녀' },
+    { en:'husband', ko:'남편' },
+    { en:'wife', ko:'아내' },
+    { en:'son', ko:'아들' },
+    { en:'daughter', ko:'딸' },
+    { en:'uncle', ko:'삼촌, 고모부, 이모부' },
+    { en:'aunt', ko:'숙모, 고모, 이모' },
+    { en:'cousin', ko:'사촌' },
+    { en:'introduce', ko:'소개하다' },
+    { en:'live', ko:'살다' },
+    { en:'together', ko:'함께, 같이' },
+  ]},
+  { id:'u06', num:6, title:'Unit 06', desc:'학교/수업', words:[
+    { en:'school', ko:'학교' },
+    { en:'teacher', ko:'선생님, 교사' },
+    { en:'teach', ko:'가르치다' },
+    { en:'student', ko:'학생' },
+    { en:'class', ko:'반, 학급; 수업' },
+    { en:'classroom', ko:'교실' },
+    { en:'classmate', ko:'반 친구' },
+    { en:'blackboard', ko:'칠판' },
+    { en:'friend', ko:'친구' },
+    { en:'enter', ko:'들어가다, 입학하다' },
+    { en:'do', ko:'하다' },
+    { en:'homework', ko:'숙제' },
+    { en:'lesson', ko:'수업, 레슨' },
+    { en:'test', ko:'테스트, 시험, 검사' },
+    { en:'grade', ko:'학년; 성적; 등급' },
+    { en:'homeroom', ko:'홈룸 (학급 모두가 모이는 교실)' },
+    { en:'elementary', ko:'초등의' },
+    { en:'learn', ko:'배우다' },
+    { en:'read', ko:'읽다' },
+    { en:'write', ko:'쓰다' },
+  ]},
+  { id:'u07', num:7, title:'Unit 07', desc:'학용품', words:[
+    { en:'bag', ko:'가방' },
+    { en:'pen', ko:'펜' },
+    { en:'pencil', ko:'연필' },
+    { en:'pencil case', ko:'필통' },
+    { en:'paper', ko:'종이' },
+    { en:'book', ko:'책' },
+    { en:'notebook', ko:'공책' },
+    { en:'textbook', ko:'교과서' },
+    { en:'eraser', ko:'지우개' },
+    { en:'ruler', ko:'자' },
+    { en:'sharp', ko:'날카로운, 뾰족한' },
+    { en:'thick', ko:'두꺼운' },
+    { en:'thin', ko:'얇은, (몸이) 마른' },
+    { en:'borrow', ko:'빌리다' },
+    { en:'scissors', ko:'가위' },
+    { en:'glue', ko:'접착제, 풀' },
+    { en:'crayon', ko:'크레용' },
+    { en:'diary', ko:'일기(장), 수첩' },
+    { en:'dictionary', ko:'사전' },
+    { en:'calendar', ko:'달력' },
+  ]},
+  { id:'u08', num:8, title:'Unit 08', desc:'공부/과목', words:[
+    { en:'study', ko:'공부하다; 공부' },
+    { en:'subject', ko:'과목' },
+    { en:'math', ko:'수학' },
+    { en:'science', ko:'과학' },
+    { en:'art', ko:'미술, 예술' },
+    { en:'music', ko:'음악' },
+    { en:'example', ko:'예, 보기' },
+    { en:'exam', ko:'시험' },
+    { en:'quiz', ko:'퀴즈, 간단한 시험' },
+    { en:'fail', ko:'실패하다; (시험에) 떨어지다' },
+    { en:'correct', ko:'맞는, 정확한; 고치다, 바로잡다' },
+    { en:'word', ko:'단어, 낱말' },
+    { en:'sentence', ko:'문장' },
+    { en:'story', ko:'이야기' },
+    { en:'ask', ko:'묻다, 질문하다; 부탁하다' },
+    { en:'question', ko:'질문, 문제' },
+    { en:'answer', ko:'대답하다; 대답' },
+    { en:'repeat', ko:'반복하다, 되풀이하다' },
+    { en:'practice', ko:'연습하다; 연습' },
+    { en:'understand', ko:'이해하다' },
+  ]},
+  { id:'u09', num:9, title:'Unit 09', desc:'스포츠/운동', words:[
+    { en:'sport(s)', ko:'스포츠, 운동' },
+    { en:'soccer', ko:'축구' },
+    { en:'football', ko:'축구, 미식축구' },
+    { en:'baseball', ko:'야구' },
+    { en:'basketball', ko:'농구' },
+    { en:'volleyball', ko:'배구' },
+    { en:'tennis', ko:'테니스' },
+    { en:'table tennis', ko:'탁구' },
+    { en:'badminton', ko:'배드민턴' },
+    { en:'skate', ko:'스케이트를 타다; 스케이트화' },
+    { en:'bat', ko:'방망이, 배트' },
+    { en:'change', ko:'변화시키다, 바꾸다; 변화, 교체' },
+    { en:'game', ko:'게임, 경기' },
+    { en:'player', ko:'선수' },
+    { en:'team', ko:'팀, 조' },
+    { en:'ready', ko:'준비된' },
+    { en:'gym', ko:'체육관' },
+    { en:'stadium', ko:'경기장' },
+    { en:'join', ko:'가입하다; 함께하다' },
+    { en:'sweat', ko:'땀을 흘리다; 땀' },
+  ]},
+  { id:'u10', num:10, title:'Unit 10', desc:'경기/시합', words:[
+    { en:'race', ko:'경주, 달리기 (시합)' },
+    { en:'match', ko:'경기, 시합' },
+    { en:'fair', ko:'공정한' },
+    { en:'point', ko:'점수; 요점' },
+    { en:'score', ko:'득점, 스코어; 득점하다' },
+    { en:'win', ko:'이기다; (메달 등을) 따다' },
+    { en:'lose', ko:'지다; 잃어버리다' },
+    { en:'watch', ko:'보다, 지켜보다' },
+    { en:'victory', ko:'승리' },
+    { en:'rule', ko:'규칙' },
+    { en:'goal', ko:'골, 득점; 목표' },
+    { en:'medal', ko:'메달' },
+    { en:'prize', ko:'상' },
+    { en:'champion', ko:'우승자, 챔피언' },
+    { en:'marathon', ko:'마라톤' },
+    { en:'speed', ko:'속도, 속력' },
+    { en:'train', ko:'훈련시키다, 훈련하다' },
+    { en:'cheer', ko:'응원하다; 응원, 환호' },
+    { en:'captain', ko:'주장' },
+    { en:'coach', ko:'감독, 지도자, 코치' },
+  ]},
+  { id:'u11', num:11, title:'Unit 11', desc:'신체 1', words:[
+    { en:'face', ko:'얼굴; (얼굴) 표정' },
+    { en:'eye', ko:'눈' },
+    { en:'nose', ko:'코' },
+    { en:'mouth', ko:'입' },
+    { en:'ear', ko:'귀' },
+    { en:'lip', ko:'입술' },
+    { en:'tooth', ko:'이, 치아' },
+    { en:'head', ko:'머리, 고개' },
+    { en:'neck', ko:'목' },
+    { en:'shoulder', ko:'어깨' },
+    { en:'arm', ko:'팔' },
+    { en:'hand', ko:'손' },
+    { en:'finger', ko:'손가락' },
+    { en:'leg', ko:'다리' },
+    { en:'foot', ko:'발' },
+    { en:'toe', ko:'발가락, 발끝' },
+    { en:'big', ko:'큰' },
+    { en:'small', ko:'작은' },
+    { en:'long', ko:'긴; 오랜' },
+    { en:'short', ko:'짧은; 키가 작은' },
+  ]},
+  { id:'u12', num:12, title:'Unit 12', desc:'외모/색깔', words:[
+    { en:'tall', ko:'키가 큰, 높은' },
+    { en:'pretty', ko:'예쁜' },
+    { en:'lovely', ko:'사랑스러운' },
+    { en:'beautiful', ko:'아름다운' },
+    { en:'beauty', ko:'아름다움; 미인' },
+    { en:'handsome', ko:'잘생긴' },
+    { en:'ugly', ko:'못생긴, 보기 흉한' },
+    { en:'fat', ko:'뚱뚱한, 살찐' },
+    { en:'slim', ko:'날씬한' },
+    { en:'young', ko:'젊은, 어린' },
+    { en:'hair', ko:'머리(털); 털' },
+    { en:'curly', ko:'곱슬곱슬한' },
+    { en:'strong', ko:'강한, 힘센' },
+    { en:'weak', ko:'약한, 힘이 없는' },
+    { en:'red', ko:'빨간(색의), 붉은; 빨간색, 빨강' },
+    { en:'blue', ko:'파란; 파란색, 파랑' },
+    { en:'green', ko:'녹색의, 초록색의; 초록색' },
+    { en:'white', ko:'흰색의, 하얀; 흰색' },
+    { en:'gray/grey', ko:'회색의; 회색' },
+    { en:'silver', ko:'은(백)색의; 은, 은색' },
+  ]},
+  { id:'u13', num:13, title:'Unit 13', desc:'건강/병', words:[
+    { en:'body', ko:'몸' },
+    { en:'have', ko:'가지다, 있다; 먹다' },
+    { en:'sick', ko:'아픈, 병든' },
+    { en:'cold', ko:'감기; 추운, 차가운' },
+    { en:'fever', ko:'열' },
+    { en:'cough', ko:'기침하다; 기침' },
+    { en:'life', ko:'인생; 생명' },
+    { en:'die', ko:'죽다' },
+    { en:'dead', ko:'죽은' },
+    { en:'care', ko:'관심을 가지다, 상관하다; 돌봄, 보살핌; 조심' },
+    { en:'mind', ko:'마음' },
+    { en:'hurt', ko:'다치게 하다, 아프다; 다친' },
+    { en:'headache', ko:'두통 (머리가 아픔)' },
+    { en:'toothache', ko:'치통 (이가 아픔)' },
+    { en:'stomach', ko:'위, 배' },
+    { en:'stomachache', ko:'복통 (배가 아픔)' },
+    { en:'medicine', ko:'약' },
+    { en:'rest', ko:'휴식; 쉬다' },
+    { en:'health', ko:'건강' },
+    { en:'healthy', ko:'건강한; 건강에 좋은' },
+  ]},
+  { id:'u14', num:14, title:'Unit 14', desc:'감정', words:[
+    { en:'happy', ko:'행복한' },
+    { en:'glad', ko:'기쁜, 반가운' },
+    { en:'excited', ko:'신이 난, 흥분한' },
+    { en:'sad', ko:'슬픈' },
+    { en:'angry', ko:'화난' },
+    { en:'upset', ko:'기분이 상한, 화난' },
+    { en:'sorry', ko:'미안한; 유감스러운' },
+    { en:'thank', ko:'감사하다, 고마워하다' },
+    { en:'love', ko:'사랑하다, 무척 좋아하다; 사랑' },
+    { en:'hate', ko:'미워하다, 몹시 싫어하다' },
+    { en:'afraid', ko:'무서워하는, 겁내는' },
+    { en:'worry', ko:'걱정하다' },
+    { en:'worried', ko:'걱정하는' },
+    { en:'fine', ko:'괜찮은; 멋진' },
+    { en:'cry', ko:'울다' },
+    { en:'crazy', ko:'(말이나 행동이) 정상이 아닌, 말도 안 되는' },
+    { en:'serious', ko:'심각한, 진지한' },
+    { en:'look', ko:'보다; ~해 보이다' },
+    { en:'feel', ko:'느끼다; ~한 기분이 들다' },
+    { en:'get', ko:'받다; 얻다; ~되다' },
+  ]},
+  { id:'u15', num:15, title:'Unit 15', desc:'사람/성격', words:[
+    { en:'baby', ko:'아기' },
+    { en:'child', ko:'아이, 어린이' },
+    { en:'kid', ko:'아이' },
+    { en:'boy', ko:'소년, 남자아이' },
+    { en:'girl', ko:'소녀, 여자아이' },
+    { en:'man', ko:'(성인) 남자; 사람' },
+    { en:'woman', ko:'(성인) 여자' },
+    { en:'gentleman', ko:'신사' },
+    { en:'lady', ko:'숙녀; 여성' },
+    { en:'person', ko:'사람' },
+    { en:'people', ko:'사람들' },
+    { en:'kind', ko:'친절한' },
+    { en:'friendly', ko:'상냥한, 친절한' },
+    { en:'brave', ko:'용감한' },
+    { en:'careful', ko:'조심스러운, 신중한' },
+    { en:'honest', ko:'정직한' },
+    { en:'polite', ko:'예의 바른, 공손한' },
+    { en:'fun', ko:'재미, 즐거움; 재미있는, 즐거운' },
+    { en:'funny', ko:'우스운, 웃기는' },
+    { en:'smart', ko:'똑똑한, 영리한' },
+  ]},
+  { id:'u16', num:16, title:'Unit 16', desc:'시간/때', words:[
+    { en:'good', ko:'좋은; 잘하는' },
+    { en:'morning', ko:'아침, 오전' },
+    { en:'afternoon', ko:'오후' },
+    { en:'evening', ko:'저녁' },
+    { en:'night', ko:'밤' },
+    { en:'noon', ko:'정오, 낮 12시' },
+    { en:'today', ko:'오늘(은)' },
+    { en:'tonight', ko:'오늘 밤에' },
+    { en:'early', ko:'일찍; 이른' },
+    { en:'late', ko:'늦게; 늦은; 지각한' },
+    { en:'tomorrow', ko:'내일' },
+    { en:'yesterday', ko:'어제' },
+    { en:'date', ko:'날짜' },
+    { en:'time', ko:'시간, 때' },
+    { en:'hour', ko:'한 시간, 시간' },
+    { en:'minute', ko:'(시간 단위의) 분' },
+    { en:'second', ko:'(시간 단위의) 초' },
+    { en:'past', ko:'과거' },
+    { en:'present', ko:'현재; 선물; 현재의' },
+    { en:'future', ko:'미래' },
+  ]},
+  { id:'u17', num:17, title:'Unit 17', desc:'요일/주', words:[
+    { en:'Monday', ko:'월요일' },
+    { en:'Tuesday', ko:'화요일' },
+    { en:'Wednesday', ko:'수요일' },
+    { en:'Thursday', ko:'목요일' },
+    { en:'Friday', ko:'금요일' },
+    { en:'Saturday', ko:'토요일' },
+    { en:'Sunday', ko:'일요일' },
+    { en:'next', ko:'다음의, 옆의' },
+    { en:'last', ko:'지난, 바로 앞의; 마지막의' },
+    { en:'busy', ko:'바쁜' },
+    { en:'day', ko:'하루, 날; 낮' },
+    { en:'week', ko:'주, 일주일' },
+    { en:'weekend', ko:'주말' },
+    { en:'meet', ko:'만나다' },
+    { en:'picnic', ko:'소풍' },
+    { en:'now', ko:'지금, 이제' },
+    { en:'once', ko:'한 번, 1회' },
+    { en:'twice', ko:'두 번, 2회' },
+    { en:'this', ko:'이것; 이 사람; 이' },
+    { en:'that', ko:'저것; 저 사람; 저' },
+  ]},
+  { id:'u18', num:18, title:'Unit 18', desc:'달/시간 표현', words:[
+    { en:'month', ko:'(달력의) 달; 한 달, 개월' },
+    { en:'year', ko:'해, 년; 1년' },
+    { en:'January', ko:'1월' },
+    { en:'February', ko:'2월' },
+    { en:'March', ko:'3월' },
+    { en:'April', ko:'4월' },
+    { en:'May', ko:'5월' },
+    { en:'June', ko:'6월' },
+    { en:'July', ko:'7월' },
+    { en:'August', ko:'8월' },
+    { en:'September', ko:'9월' },
+    { en:'October', ko:'10월' },
+    { en:'November', ko:'11월' },
+    { en:'December', ko:'12월' },
+    { en:'every', ko:'모든; 매 ~, ~마다' },
+    { en:'before', ko:'~ 전에' },
+    { en:'after', ko:'~ 후에' },
+    { en:'during', ko:'(특정 기간의) ~ 동안, ~ 내내' },
+    { en:'then', ko:'그때; 그러고 나서' },
+    { en:'later', ko:'나중에; ~ 뒤에' },
+  ]},
+  { id:'u19', num:19, title:'Unit 19', desc:'생일/순서', words:[
+    { en:'birthday', ko:'생일' },
+    { en:'party', ko:'파티' },
+    { en:'cake', ko:'케이크' },
+    { en:'candle', ko:'초' },
+    { en:'gift', ko:'선물' },
+    { en:'age', ko:'나이' },
+    { en:'invite', ko:'초대하다' },
+    { en:'surprise', ko:'놀람; 깜짝 놀라기; 놀라게 하다' },
+    { en:'celebrate', ko:'축하하다, 기념하다' },
+    { en:'laugh', ko:'웃다' },
+    { en:'first', ko:'첫 번째의' },
+    { en:'second', ko:'두 번째의' },
+    { en:'third', ko:'세 번째의' },
+    { en:'fourth', ko:'네 번째의' },
+    { en:'fifth', ko:'다섯 번째의' },
+    { en:'sixth', ko:'여섯 번째의' },
+    { en:'seventh', ko:'일곱 번째의' },
+    { en:'eighth', ko:'여덟 번째의' },
+    { en:'ninth', ko:'아홉 번째의' },
+    { en:'tenth', ko:'열 번째의' },
+  ]},
+  { id:'u20', num:20, title:'Unit 20', desc:'일상/습관', words:[
+    { en:'wake', ko:'(잠에서) 깨다, 일어나다; 깨우다' },
+    { en:'exercise', ko:'운동; 운동하다' },
+    { en:'wash', ko:'씻다' },
+    { en:'sleep', ko:'잠자다; 잠, 수면' },
+    { en:'drive', ko:'운전하다' },
+    { en:'bath', ko:'목욕; 욕조' },
+    { en:'always', ko:'항상, 언제나' },
+    { en:'usually', ko:'대개, 보통' },
+    { en:'often', ko:'자주' },
+    { en:'sometimes', ko:'가끔, 때때로' },
+    { en:'never', ko:'결코[절대] ~ 않다' },
+    { en:'wait', ko:'기다리다' },
+    { en:'moment', ko:'잠시, 잠깐; 순간' },
+    { en:'run', ko:'달리다, 뛰다' },
+    { en:'help', ko:'돕다; 도와주다; 도움' },
+    { en:'bad', ko:'나쁜' },
+    { en:'habit', ko:'습관' },
+    { en:'stop', ko:'멈추다; 멈추게 하다' },
+    { en:'bite', ko:'(이빨로) 물다' },
+    { en:'nail', ko:'손톱, 발톱; 못' },
+  ]},
+  { id:'u21', num:21, title:'Unit 21', desc:'장소/공공기관', words:[
+    { en:'store', ko:'가게, 상점' },
+    { en:'restaurant', ko:'식당, 음식점, 레스토랑' },
+    { en:'bakery', ko:'빵집, 제과점' },
+    { en:'church', ko:'교회' },
+    { en:'library', ko:'도서관' },
+    { en:'hospital', ko:'병원' },
+    { en:'drugstore', ko:'약국' },
+    { en:'post office', ko:'우체국' },
+    { en:'police station', ko:'경찰서' },
+    { en:'find', ko:'찾다, 발견하다' },
+    { en:'build', ko:'(건물 등을) 짓다, 세우다' },
+    { en:'building', ko:'건물, 빌딩' },
+    { en:'company', ko:'회사, 기업' },
+    { en:'pool', ko:'수영장' },
+    { en:'park', ko:'공원' },
+    { en:'theater', ko:'극장' },
+    { en:'museum', ko:'박물관' },
+    { en:'zoo', ko:'동물원' },
+    { en:'airport', ko:'공항' },
+    { en:'factory', ko:'공장' },
+  ]},
+  { id:'u22', num:22, title:'Unit 22', desc:'위치/전치사', words:[
+    { en:'on', ko:'~ (위)에' },
+    { en:'in', ko:'~ (안)에[에서]' },
+    { en:'under', ko:'~ 아래에' },
+    { en:'in front of', ko:'~ 앞에' },
+    { en:'behind', ko:'~ 뒤에' },
+    { en:'next to', ko:'~ 옆에; ~ 다음의' },
+    { en:'between', ko:'~ 사이에' },
+    { en:'around', ko:'~ 주위에, ~ 둘레에' },
+    { en:'over', ko:'(닿지 않게) ~ 위에, ~위로' },
+    { en:'top', ko:'맨 위, 꼭대기' },
+    { en:'middle', ko:'(한)가운데, 중간' },
+    { en:'corner', ko:'모서리; 길모퉁이' },
+    { en:'end', ko:'끝, 말; 끝나다' },
+    { en:'ground', ko:'땅, 땅바닥' },
+    { en:'grass', ko:'풀; 잔디' },
+    { en:'field', ko:'들판, 밭' },
+    { en:'area', ko:'지역, 구역' },
+    { en:'hill', ko:'언덕, (낮은) 산' },
+    { en:'here', ko:'여기에, 이쪽으로' },
+    { en:'there', ko:'거기에, 그곳에' },
+  ]},
+  { id:'u23', num:23, title:'Unit 23', desc:'쇼핑/상점', words:[
+    { en:'market', ko:'시장' },
+    { en:'supermarket', ko:'슈퍼마켓' },
+    { en:'shop', ko:'가게, 상점; 사다, 쇼핑하다' },
+    { en:'department store', ko:'백화점' },
+    { en:'buy', ko:'사다' },
+    { en:'sell', ko:'팔다, 판매하다' },
+    { en:'pay', ko:'지불하다, (돈을) 내다' },
+    { en:'price', ko:'가격' },
+    { en:'cheap', ko:'(값이) 싼' },
+    { en:'expensive', ko:'비싼' },
+    { en:'free', ko:'무료의; 자유로운; 한가한' },
+    { en:'sale', ko:'판매; 세일, 할인 판매' },
+    { en:'clerk', ko:'점원, 직원' },
+    { en:'open', ko:'열다; 열려 있는' },
+    { en:'close', ko:'닫다; 가까운' },
+    { en:'choose', ko:'선택하다, 고르다' },
+    { en:'pick', ko:'고르다, (과일 등을) 따다, 꺾다' },
+    { en:'thing', ko:'것, 일; 물건' },
+    { en:'town', ko:'마을, 동네' },
+    { en:'line', ko:'선, 줄' },
+  ]},
+  { id:'u24', num:24, title:'Unit 24', desc:'돈/은행', words:[
+    { en:'bank', ko:'은행' },
+    { en:'money', ko:'돈' },
+    { en:'bill', ko:'지폐; 계산서' },
+    { en:'dollar', ko:'달러; 1달러' },
+    { en:'coin', ko:'동전' },
+    { en:'gold', ko:'금; 황금색; 황금색의' },
+    { en:'spend', ko:'(돈을) 쓰다; (시간을) 보내다' },
+    { en:'need', ko:'필요하다' },
+    { en:'copy', ko:'복사(본); 복사하다, 베끼다' },
+    { en:'exchange', ko:'교환하다; 환전하다; 교환; 환전' },
+    { en:'rich', ko:'부유한, 돈 많은' },
+    { en:'poor', ko:'가난한' },
+    { en:'save', ko:'저축하다; 절약하다; 구하다' },
+    { en:'waste', ko:'낭비하다' },
+    { en:'count', ko:'(수를) 세다' },
+    { en:'collect', ko:'모으다, 수집하다' },
+    { en:'add', ko:'더하다, 추가하다' },
+    { en:'divide', ko:'나누다' },
+    { en:'wallet', ko:'지갑' },
+    { en:'enough', ko:'충분한; 충분히' },
+  ]},
+  { id:'u25', num:25, title:'Unit 25', desc:'음식 1 (요리)', words:[
+    { en:'dish', ko:'접시; 요리' },
+    { en:'meat', ko:'고기' },
+    { en:'chicken', ko:'닭; 닭고기' },
+    { en:'beef', ko:'소고기' },
+    { en:'pork', ko:'돼지고기' },
+    { en:'soup', ko:'수프' },
+    { en:'sugar', ko:'설탕' },
+    { en:'salt', ko:'소금' },
+    { en:'salty', ko:'소금이 든, 짠, 짭짤한' },
+    { en:'spicy', ko:'매운, 양념 맛이 강한' },
+    { en:'meal', ko:'식사' },
+    { en:'order', ko:'주문하다; 명령하다; 순서; 주문; 명령' },
+    { en:'pizza', ko:'피자' },
+    { en:'hamburger', ko:'햄버거' },
+    { en:'bake', ko:'굽다' },
+    { en:'cookie', ko:'쿠키' },
+    { en:'pie', ko:'파이' },
+    { en:'chef', ko:'요리사' },
+    { en:'waiter', ko:'종업원, 웨이터' },
+    { en:'oil', ko:'기름, 오일' },
+  ]},
+  { id:'u26', num:26, title:'Unit 26', desc:'취미/악기', words:[
+    { en:'hobby', ko:'취미' },
+    { en:'play', ko:'(악기를) 연주하다; 놀다, (게임 등을) 하다' },
+    { en:'piano', ko:'피아노' },
+    { en:'guitar', ko:'기타' },
+    { en:'drum', ko:'드럼' },
+    { en:'violin', ko:'바이올린' },
+    { en:'sing', ko:'노래하다, (노래를) 부르다' },
+    { en:'listen', ko:'듣다' },
+    { en:'like', ko:'좋아하다' },
+    { en:'favorite', ko:'마음에 드는, 가장 좋아하는' },
+    { en:'activity', ko:'활동' },
+    { en:'interested', ko:'관심[흥미] 있어 하는' },
+    { en:'movie', ko:'영화' },
+    { en:'dance', ko:'춤을 추다; 춤, 무용, 댄스' },
+    { en:'camera', ko:'카메라, 사진기' },
+    { en:'kite', ko:'연' },
+    { en:'jump rope', ko:'줄넘기' },
+    { en:'picture', ko:'그림; 사진' },
+    { en:'puzzle', ko:'퍼즐' },
+    { en:'fish', ko:'물고기, 생선; 낚시하다' },
+  ]},
+  { id:'u27', num:27, title:'Unit 27', desc:'이야기/캐릭터', words:[
+    { en:'begin', ko:'시작하다; 시작되다' },
+    { en:'character', ko:'성격; 등장인물, 캐릭터' },
+    { en:'king', ko:'왕' },
+    { en:'queen', ko:'여왕, 왕비' },
+    { en:'prince', ko:'왕자' },
+    { en:'princess', ko:'공주' },
+    { en:'angel', ko:'천사' },
+    { en:'palace', ko:'궁, 궁전' },
+    { en:'crown', ko:'왕관' },
+    { en:'adventure', ko:'모험' },
+    { en:'giant', ko:'거인; 거대한' },
+    { en:'hero', ko:'영웅' },
+    { en:'god', ko:'신' },
+    { en:'ghost', ko:'유령, 귀신' },
+    { en:'forever', ko:'영원히' },
+    { en:'dream', ko:'꿈; 꿈을 꾸다' },
+    { en:'imagine', ko:'상상하다' },
+    { en:'create', ko:'만들다, 창조하다' },
+    { en:'novel', ko:'소설' },
+    { en:'cartoon', ko:'(풍자) 만화; 만화 영화' },
+  ]},
+  { id:'u28', num:28, title:'Unit 28', desc:'나라/세계', words:[
+    { en:'Korea', ko:'한국' },
+    { en:'China', ko:'중국' },
+    { en:'Japan', ko:'일본' },
+    { en:'India', ko:'인도' },
+    { en:'America', ko:'미국; 아메리카 대륙' },
+    { en:'Germany', ko:'독일' },
+    { en:'England', ko:'(좁은 뜻) 잉글랜드; (넓은 뜻) 영국' },
+    { en:'France', ko:'프랑스' },
+    { en:'Italy', ko:'이탈리아' },
+    { en:'world', ko:'세계' },
+    { en:'visit', ko:'(사람·장소를) 방문하다, 찾아가다' },
+    { en:'stay', ko:'머무르다' },
+    { en:'hotel', ko:'호텔' },
+    { en:'travel', ko:'여행하다[가다]; 여행' },
+    { en:'city', ko:'도시' },
+    { en:'country', ko:'나라, 국가' },
+    { en:'capital', ko:'수도; 대문자' },
+    { en:'village', ko:'마을' },
+    { en:'leave', ko:'떠나다, 출발하다' },
+    { en:'arrive', ko:'도착하다' },
+  ]},
+  { id:'u29', num:29, title:'Unit 29', desc:'여행/비행기', words:[
+    { en:'pilot', ko:'조종사' },
+    { en:'seat', ko:'자리, 좌석' },
+    { en:'pass', ko:'지나가다; 건네주다; (시험에) 합격하다; 출입증' },
+    { en:'passport', ko:'여권' },
+    { en:'ticket', ko:'표, 승차권' },
+    { en:'fly', ko:'날다; 비행하다; 파리' },
+    { en:'board', ko:'탑승하다; 판자' },
+    { en:'wing', ko:'날개' },
+    { en:'engine', ko:'엔진' },
+    { en:'service', ko:'서비스' },
+    { en:'tour', ko:'여행, 관광, 투어' },
+    { en:'tourist', ko:'관광객' },
+    { en:'guide', ko:'안내인, 가이드; 안내 책자; 안내하다' },
+    { en:'journey', ko:'(특히 멀리 가는) 여행' },
+    { en:'trip', ko:'(짧은) 여행' },
+    { en:'schedule', ko:'일정, 스케줄' },
+    { en:'vacation', ko:'방학, 휴가' },
+    { en:'holiday', ko:'휴일; 방학, 휴가' },
+    { en:'fantastic', ko:'환상적인, 멋진' },
+    { en:'perfect', ko:'완벽한' },
+  ]},
+  { id:'u30', num:30, title:'Unit 30', desc:'캠핑/등산', words:[
+    { en:'camp', ko:'캠핑을 하다; 야영지; 캠프' },
+    { en:'tent', ko:'텐트, 천막' },
+    { en:'map', ko:'지도' },
+    { en:'carry', ko:'가지고 있다[다니다]; 나르다' },
+    { en:'bring', ko:'가져오다, 데려오다' },
+    { en:'backpack', ko:'배낭' },
+    { en:'group', ko:'무리, 집단' },
+    { en:'hungry', ko:'배고픈' },
+    { en:'thirsty', ko:'목이 마른' },
+    { en:'food', ko:'음식' },
+    { en:'dig', ko:'파다' },
+    { en:'hole', ko:'구멍' },
+    { en:'pot', ko:'냄비; 화분' },
+    { en:'fire', ko:'불, 화재' },
+    { en:'stick', ko:'(부러진) 나뭇가지; 막대기' },
+    { en:'outdoor', ko:'야외의, 실외의' },
+    { en:'hide', ko:'숨기다; 숨다' },
+    { en:'climb', ko:'오르다, 올라가다' },
+    { en:'mountain', ko:'산' },
+    { en:'hiking', ko:'하이킹, 등산' },
+  ]},
+  { id:'u31', num:31, title:'Unit 31', desc:'영화/공연', words:[
+    { en:'film', ko:'(주로 영국) 영화; 필름' },
+    { en:'magic', ko:'마법, 마술; 마법의, 마술의' },
+    { en:'comedy', ko:'코미디, 희극' },
+    { en:'show', ko:'보여 주다; 쇼, (텔레비전 등의) 프로그램' },
+    { en:'musical', ko:'음악의, 음악적인; 뮤지컬' },
+    { en:'act', ko:'행동하다; 연기하다; 행동' },
+    { en:'actor', ko:'배우' },
+    { en:'actress', ko:'여배우' },
+    { en:'stage', ko:'무대; 단계' },
+    { en:'role', ko:'역할' },
+    { en:'wish', ko:'원하다, 바라다; 소망, 소원' },
+    { en:'song', ko:'노래' },
+    { en:'popular', ko:'인기 있는' },
+    { en:'amazing', ko:'놀라운' },
+    { en:'wonderful', ko:'아주 멋진, 훌륭한' },
+    { en:'excellent', ko:'훌륭한, 탁월한' },
+    { en:'humorous', ko:'재미있는, 유머러스한' },
+    { en:'start', ko:'시작하다' },
+    { en:'finish', ko:'끝내다, 마치다' },
+    { en:'wonder', ko:'궁금하다, 궁금해하다' },
+  ]},
+  { id:'u32', num:32, title:'Unit 32', desc:'행사/축제', words:[
+    { en:'event', ko:'행사; 사건' },
+    { en:'card', ko:'카드' },
+    { en:'enjoy', ko:'즐기다, 즐거운 시간을 보내다' },
+    { en:'concert', ko:'콘서트, 연주회' },
+    { en:'festival', ko:'축제' },
+    { en:'wedding', ko:'결혼(식)' },
+    { en:'marry', ko:'결혼하다' },
+    { en:'contest', ko:'대회, 시합' },
+    { en:'march', ko:'행진하다; 행진; 행진곡' },
+    { en:'gather', ko:'모이다, 모으다' },
+    { en:'joy', ko:'기쁨' },
+    { en:'exciting', ko:'신나는, 흥미진진한' },
+    { en:'interesting', ko:'흥미로운, 재미있는' },
+    { en:'band', ko:'밴드, 악단' },
+    { en:'welcome', ko:'맞이하다, 환영하다' },
+    { en:'hall', ko:'홀' },
+    { en:'memory', ko:'기억, 추억' },
+    { en:'balloon', ko:'풍선' },
+    { en:'prepare', ko:'준비하다' },
+    { en:'album', ko:'앨범' },
+  ]},
+  { id:'u33', num:33, title:'Unit 33', desc:'교통수단', words:[
+    { en:'ride', ko:'타다; 타기' },
+    { en:'bicycle', ko:'자전거' },
+    { en:'motorcycle', ko:'오토바이' },
+    { en:'take', ko:'(교통수단을) 타다; 가지고[데리고] 가다' },
+    { en:'car', ko:'차, 자동차' },
+    { en:'bus', ko:'버스' },
+    { en:'taxi', ko:'택시' },
+    { en:'truck', ko:'트럭' },
+    { en:'train', ko:'기차, 열차' },
+    { en:'subway', ko:'지하철' },
+    { en:'airplane', ko:'비행기' },
+    { en:'ship', ko:'(큰) 배, 선박' },
+    { en:'boat', ko:'(작은) 배, 보트' },
+    { en:'way', ko:'길; 방법' },
+    { en:'accident', ko:'사고' },
+    { en:'dangerous', ko:'위험한' },
+    { en:'safe', ko:'안전한' },
+    { en:'burn', ko:'(불에) 타다; 태우다' },
+    { en:'news', ko:'뉴스, 소식' },
+    { en:'happen', ko:'일어나다, 발생하다' },
+  ]},
+  { id:'u34', num:34, title:'Unit 34', desc:'방향/길', words:[
+    { en:'go', ko:'가다' },
+    { en:'come', ko:'오다' },
+    { en:'left', ko:'왼쪽, 좌측; 왼쪽의; 왼쪽으로' },
+    { en:'right', ko:'오른쪽; 옳은; 맞는; 오른쪽의; 오른쪽으로' },
+    { en:'move', ko:'움직이다; 옮기다; 이사하다' },
+    { en:'straight', ko:'똑바로' },
+    { en:'east', ko:'동쪽; 동쪽의; 동쪽으로' },
+    { en:'west', ko:'서쪽; 서쪽의; 서쪽으로' },
+    { en:'south', ko:'남쪽; 남쪽의; 남쪽으로' },
+    { en:'north', ko:'북쪽; 북쪽의; 북쪽으로' },
+    { en:'cross', ko:'(가로질러) 건너다' },
+    { en:'street', ko:'거리, 도로' },
+    { en:'road', ko:'(차가 다니는) 도로, 길' },
+    { en:'sign', ko:'표지판, 간판; 서명하다' },
+    { en:'turn', ko:'돌다, 돌리다' },
+    { en:'return', ko:'돌아오다, 돌아가다' },
+    { en:'far', ko:'멀리' },
+    { en:'up', ko:'위로, 위에, 위쪽으로' },
+    { en:'down', ko:'아래로, 아래에, 아래쪽으로' },
+    { en:'away', ko:'떨어져서; 저쪽으로' },
+  ]},
+  { id:'u35', num:35, title:'Unit 35', desc:'우편/통신', words:[
+    { en:'mail', ko:'우편, 우편물' },
+    { en:'letter', ko:'편지' },
+    { en:'name', ko:'이름' },
+    { en:'address', ko:'주소' },
+    { en:'stamp', ko:'우표; 도장' },
+    { en:'envelope', ko:'봉투' },
+    { en:'postcard', ko:'엽서' },
+    { en:'send', ko:'보내다' },
+    { en:'receive', ko:'받다' },
+    { en:'reply', ko:'대답하다; 답장을 보내다; 대답; 답장' },
+    { en:'deliver', ko:'배달하다' },
+    { en:'call', ko:'전화하다; 부르다' },
+    { en:'speak', ko:'이야기하다, 말을 주고 받다' },
+    { en:'say', ko:'말하다' },
+    { en:'tell', ko:'(말·글로) 알리다; 말하다' },
+    { en:'chat', ko:'이야기를 나누다, 수다를 떨다' },
+    { en:'note', ko:'메모, 쪽지' },
+    { en:'voice', ko:'목소리, 음성' },
+    { en:'record', ko:'기록; 기록하다; 녹음하다' },
+    { en:'dialog(ue)', ko:'대화' },
+  ]},
+  { id:'u36', num:36, title:'Unit 36', desc:'음식 2/식사', words:[
+    { en:'rice', ko:'쌀; 밥' },
+    { en:'bread', ko:'빵' },
+    { en:'sandwich', ko:'샌드위치' },
+    { en:'cheese', ko:'치즈' },
+    { en:'butter', ko:'버터' },
+    { en:'egg', ko:'달걀, 계란' },
+    { en:'salad', ko:'샐러드' },
+    { en:'noodle', ko:'국수, 면' },
+    { en:'honey', ko:'(벌)꿀' },
+    { en:'dessert', ko:'디저트, 후식' },
+    { en:'eat', ko:'먹다' },
+    { en:'breakfast', ko:'아침 (식사)' },
+    { en:'lunch', ko:'점심 (식사)' },
+    { en:'dinner', ko:'저녁 (식사)' },
+    { en:'drink', ko:'마시다; 음료, 마실 것' },
+    { en:'milk', ko:'우유' },
+    { en:'tea', ko:'차' },
+    { en:'coffee', ko:'커피' },
+    { en:'delicious', ko:'아주 맛있는' },
+    { en:'sweet', ko:'단, 달콤한' },
+  ]},
+  { id:'u37', num:37, title:'Unit 37', desc:'수량/숫자', words:[
+    { en:'many', ko:'(수가) 많은' },
+    { en:'much', ko:'(양이) 많은' },
+    { en:'some', ko:'약간의, 몇몇의' },
+    { en:'few', ko:'(수가) 거의 없는' },
+    { en:'a few', ko:'(수가) 약간의, 여러, 몇' },
+    { en:'little', ko:'(양이) 거의 없는; 작은; 어린' },
+    { en:'a little', ko:'(양이) 약간의, 조금의' },
+    { en:'hundred', ko:'백, 100; 백의, 100의' },
+    { en:'thousand', ko:'천, 1000; 천의, 1000의' },
+    { en:'million', ko:'백만, 100만; 백만의, 100만의' },
+    { en:'fill', ko:'(가득) 채우다' },
+    { en:'full', ko:'가득 찬, 가득한' },
+    { en:'empty', ko:'빈, 비어 있는' },
+    { en:'fruit', ko:'과일' },
+    { en:'vegetable', ko:'채소' },
+    { en:'basket', ko:'바구니' },
+    { en:'snack', ko:'간식' },
+    { en:'all', ko:'모든, 전부의' },
+    { en:'each', ko:'각각의, 각자의' },
+    { en:'half', ko:'반, 절반; 반의, 절반의' },
+  ]},
+  { id:'u38', num:38, title:'Unit 38', desc:'과일/채소', words:[
+    { en:'apple', ko:'사과' },
+    { en:'banana', ko:'바나나' },
+    { en:'orange', ko:'오렌지; 오렌지[주황]색; 오렌지[주황]색의' },
+    { en:'grape', ko:'포도' },
+    { en:'strawberry', ko:'딸기' },
+    { en:'lemon', ko:'레몬' },
+    { en:'pear', ko:'배' },
+    { en:'watermelon', ko:'수박' },
+    { en:'juice', ko:'주스, 즙' },
+    { en:'sour', ko:'(맛이) 신' },
+    { en:'tomato', ko:'토마토' },
+    { en:'carrot', ko:'당근' },
+    { en:'potato', ko:'감자' },
+    { en:'corn', ko:'옥수수' },
+    { en:'onion', ko:'양파' },
+    { en:'cucumber', ko:'오이' },
+    { en:'pumpkin', ko:'호박' },
+    { en:'bean', ko:'콩' },
+    { en:'nut', ko:'견과(류), 나무 열매 (껍질이 단단한 호두·밤 등)' },
+    { en:'fresh', ko:'신선한' },
+  ]},
+  { id:'u39', num:39, title:'Unit 39', desc:'농장/곤충', words:[
+    { en:'farm', ko:'농장' },
+    { en:'hen', ko:'암탉' },
+    { en:'sheep', ko:'양' },
+    { en:'cow', ko:'암소, 젖소' },
+    { en:'goat', ko:'염소' },
+    { en:'duck', ko:'오리' },
+    { en:'goose', ko:'거위' },
+    { en:'pig', ko:'돼지' },
+    { en:'rabbit', ko:'토끼' },
+    { en:'horse', ko:'말' },
+    { en:'mouse', ko:'쥐; (컴퓨터) 마우스' },
+    { en:'feed', ko:'먹이를 주다, 먹이다' },
+    { en:'catch', ko:'잡다, 받다; (붙)잡다' },
+    { en:'ant', ko:'개미' },
+    { en:'butterfly', ko:'나비' },
+    { en:'bee', ko:'벌' },
+    { en:'bug', ko:'벌레, 작은 곤충' },
+    { en:'worm', ko:'(땅속에 사는) 벌레' },
+    { en:'mosquito', ko:'모기' },
+    { en:'spider', ko:'거미' },
+  ]},
+  { id:'u40', num:40, title:'Unit 40', desc:'동물/애완동물', words:[
+    { en:'wild', ko:'야생의; 자연 그대로의' },
+    { en:'animal', ko:'동물' },
+    { en:'elephant', ko:'코끼리' },
+    { en:'bear', ko:'곰' },
+    { en:'squirrel', ko:'다람쥐' },
+    { en:'wolf', ko:'늑대' },
+    { en:'fox', ko:'여우' },
+    { en:'giraffe', ko:'기린' },
+    { en:'kangaroo', ko:'캥거루' },
+    { en:'deer', ko:'사슴' },
+    { en:'pet', ko:'애완동물' },
+    { en:'dog', ko:'개' },
+    { en:'cat', ko:'고양이' },
+    { en:'bird', ko:'새' },
+    { en:'parrot', ko:'앵무새' },
+    { en:'turtle', ko:'거북, 바다거북' },
+    { en:'tail', ko:'꼬리' },
+    { en:'cute', ko:'귀여운' },
+    { en:'want', ko:'원하다, ~하고 싶어 하다' },
+    { en:'hunt', ko:'사냥하다' },
+  ]},
+  { id:'u41', num:41, title:'Unit 41', desc:'자연/땅', words:[
+    { en:'nature', ko:'자연' },
+    { en:'land', ko:'육지, 땅' },
+    { en:'island', ko:'섬' },
+    { en:'sea', ko:'바다' },
+    { en:'river', ko:'강' },
+    { en:'lake', ko:'호수' },
+    { en:'pond', ko:'연못' },
+    { en:'cave', ko:'동굴' },
+    { en:'forest', ko:'(광대한) 숲, 삼림' },
+    { en:'wood', ko:'나무, 목재; 숲' },
+    { en:'jungle', ko:'밀림, 정글' },
+    { en:'desert', ko:'사막' },
+    { en:'valley', ko:'골짜기, 계곡' },
+    { en:'rock', ko:'바위' },
+    { en:'stone', ko:'돌' },
+    { en:'plant', ko:'식물; 심다' },
+    { en:'soil', ko:'흙, 토양' },
+    { en:'mud', ko:'진흙' },
+    { en:'native', ko:'출생지의, 모국의; 원주민의; 토종의' },
+    { en:'discover', ko:'발견하다' },
+  ]},
+  { id:'u42', num:42, title:'Unit 42', desc:'바다/해변', words:[
+    { en:'ocean', ko:'대양, 바다' },
+    { en:'beach', ko:'해변, 바닷가' },
+    { en:'wave', ko:'파도, 물결' },
+    { en:'sand', ko:'모래; 모래밭' },
+    { en:'sandcastle', ko:'모래성' },
+    { en:'sail', ko:'항해하다' },
+    { en:'deep', ko:'깊은' },
+    { en:'swim', ko:'수영하다, 헤엄치다' },
+    { en:'lie', ko:'눕다, 누워 있다' },
+    { en:'relax', ko:'휴식을 취하다; 긴장을 풀다' },
+    { en:'put on', ko:'입다, 신다, 쓰다' },
+    { en:'take off', ko:'(옷 등을) 벗다' },
+    { en:'hat', ko:'모자' },
+    { en:'sunglasses', ko:'선글라스' },
+    { en:'sandals', ko:'샌들' },
+    { en:'view', ko:'전망, 경치; 견해, 의견' },
+    { en:'peaceful', ko:'평화로운' },
+    { en:'dolphin', ko:'돌고래' },
+    { en:'whale', ko:'고래' },
+    { en:'shark', ko:'상어' },
+  ]},
+  { id:'u43', num:43, title:'Unit 43', desc:'하늘/식물', words:[
+    { en:'sky', ko:'하늘' },
+    { en:'sun', ko:'해, 태양' },
+    { en:'moon', ko:'달' },
+    { en:'star', ko:'별' },
+    { en:'cloud', ko:'구름' },
+    { en:'rain', ko:'비' },
+    { en:'rainbow', ko:'무지개' },
+    { en:'wind', ko:'바람' },
+    { en:'bright', ko:'밝은, 빛나는' },
+    { en:'dark', ko:'어두운, 캄캄한' },
+    { en:'flower', ko:'꽃' },
+    { en:'tree', ko:'나무' },
+    { en:'leaf', ko:'잎' },
+    { en:'seed', ko:'씨, 씨앗' },
+    { en:'sunflower', ko:'해바라기' },
+    { en:'rose', ko:'장미' },
+    { en:'tulip', ko:'튤립' },
+    { en:'lily', ko:'백합' },
+    { en:'grow', ko:'자라다; (식물을) 기르다, 재배하다' },
+    { en:'fall', ko:'떨어지다, 내리다; 넘어지다' },
+  ]},
+  { id:'u44', num:44, title:'Unit 44', desc:'날씨/계절', words:[
+    { en:'weather', ko:'날씨' },
+    { en:'hot', ko:'더운, 뜨거운' },
+    { en:'freeze', ko:'얼다, 얼리다' },
+    { en:'warm', ko:'따뜻한' },
+    { en:'cool', ko:'시원한' },
+    { en:'sunny', ko:'화창한' },
+    { en:'cloudy', ko:'흐린, 구름 낀' },
+    { en:'foggy', ko:'안개 낀' },
+    { en:'windy', ko:'바람이 부는' },
+    { en:'rainy', ko:'비가 오는' },
+    { en:'snowy', ko:'눈이 내리는, 눈이 많은' },
+    { en:'stormy', ko:'폭풍우가 몰아치는' },
+    { en:'clear', ko:'(날씨가) 맑은; 분명한' },
+    { en:'so', ko:'정말, 너무' },
+    { en:'sunshine', ko:'햇빛, 햇살' },
+    { en:'season', ko:'계절; 철, 시즌' },
+    { en:'spring', ko:'봄' },
+    { en:'summer', ko:'여름' },
+    { en:'autumn/fall', ko:'가을' },
+    { en:'winter', ko:'겨울' },
+  ]},
+  { id:'u45', num:45, title:'Unit 45', desc:'환경 보호', words:[
+    { en:'earth', ko:'지구; 땅' },
+    { en:'water', ko:'물' },
+    { en:'air', ko:'공기, 대기' },
+    { en:'gas', ko:'기체, 가스' },
+    { en:'pollution', ko:'오염' },
+    { en:'smoke', ko:'연기; 담배를 피우다' },
+    { en:'protect', ko:'보호하다' },
+    { en:'destroy', ko:'파괴하다' },
+    { en:'environment', ko:'환경' },
+    { en:'harmony', ko:'조화, 화합' },
+    { en:'recycle', ko:'재활용하다' },
+    { en:'plastic', ko:'플라스틱; 플라스틱[비닐]으로 된' },
+    { en:'trash', ko:'쓰레기' },
+    { en:'garbage', ko:'(음식물 등의) 쓰레기' },
+    { en:'throw away', ko:'버리다' },
+    { en:'pick up', ko:'~을 집다[줍다], 들어 올리다; ~를 (차에) 태우러 가다' },
+    { en:'try', ko:'노력하다; 시도하다' },
+    { en:'turn on', ko:'켜다' },
+    { en:'turn off', ko:'끄다' },
+    { en:'switch', ko:'스위치' },
+  ]},
+  { id:'u46', num:46, title:'Unit 46', desc:'감각/형용사', words:[
+    { en:'see', ko:'보다' },
+    { en:'hear', ko:'듣다' },
+    { en:'smell', ko:'~한 냄새가 나다; 냄새, 향' },
+    { en:'taste', ko:'~ 맛이 나다; 맛' },
+    { en:'sound', ko:'~인 것 같다, ~처럼 들리다; 소리' },
+    { en:'touch', ko:'만지다, 건드리다' },
+    { en:'quick', ko:'빠른, 신속한' },
+    { en:'fast', ko:'빠른; 빨리, 빠르게' },
+    { en:'slow', ko:'느린' },
+    { en:'high', ko:'높은; 높이, 높게' },
+    { en:'low', ko:'낮은; 낮게' },
+    { en:'quiet', ko:'조용한' },
+    { en:'loud', ko:'(소리가) 큰, 시끄러운' },
+    { en:'noise', ko:'(듣기 싫은) 소음, 소리' },
+    { en:'noisy', ko:'시끄러운, 떠들썩한' },
+    { en:'simple', ko:'간단한, 단순한' },
+    { en:'easy', ko:'쉬운' },
+    { en:'difficult', ko:'어려운' },
+    { en:'great', ko:'훌륭한, 위대한; 아주 좋은' },
+    { en:'terrible', ko:'끔찍한; 형편없는' },
+  ]},
+  { id:'u47', num:47, title:'Unit 47', desc:'모양/크기', words:[
+    { en:'circle', ko:'원, 동그라미' },
+    { en:'square', ko:'정사각형' },
+    { en:'triangle', ko:'삼각형' },
+    { en:'shape', ko:'모양, 형태' },
+    { en:'round', ko:'둥근, 원형의' },
+    { en:'color', ko:'색, 색깔' },
+    { en:'draw', ko:'(연필 등으로) 그리다' },
+    { en:'paint', ko:'페인트; 페인트를 칠하다; (그림물감으로) 그리다' },
+    { en:'make', ko:'만들다' },
+    { en:'cut', ko:'자르다' },
+    { en:'wide', ko:'넓은' },
+    { en:'narrow', ko:'좁은' },
+    { en:'large', ko:'(규모가) 큰; (양이) 많은' },
+    { en:'huge', ko:'거대한, 막대한' },
+    { en:'light', ko:'빛; (전)등; 밝은; 가벼운' },
+    { en:'heavy', ko:'무거운' },
+    { en:'side', ko:'쪽; 측면, 옆면' },
+    { en:'stair', ko:'계단' },
+    { en:'gate', ko:'문, 대문' },
+    { en:'size', ko:'크기; 사이즈' },
+  ]},
+  { id:'u48', num:48, title:'Unit 48', desc:'동작/운동', words:[
+    { en:'sit', ko:'앉다' },
+    { en:'stand', ko:'서 있다; 일어서다' },
+    { en:'walk', ko:'걷다, 걸어가다' },
+    { en:'jump', ko:'뛰다, 점프하다' },
+    { en:'throw', ko:'던지다' },
+    { en:'kick', ko:'(발로) 차다' },
+    { en:'hit', ko:'때리다, 치다' },
+    { en:'push', ko:'밀다' },
+    { en:'hold', ko:'잡고[들고/안고] 있다' },
+    { en:'ball', ko:'공' },
+    { en:'raise', ko:'들어 올리다, 들다; 키우다' },
+    { en:'lift', ko:'들어 올리다' },
+    { en:'shout', ko:'외치다, 소리치다' },
+    { en:'roll', ko:'구르다, 굴러가다' },
+    { en:'hurry', ko:'서두르다' },
+    { en:'shut', ko:'닫다, 닫히다' },
+    { en:'shake', ko:'흔들리다, 흔들다' },
+    { en:'bottle', ko:'병' },
+    { en:'swing', ko:'그네; 흔들리다, 흔들다' },
+    { en:'slide', ko:'미끄럼틀; 미끄러지다' },
+  ]},
+  { id:'u49', num:49, title:'Unit 49', desc:'집/건물', words:[
+    { en:'fix', ko:'고정하다; 수리하다, 바로잡다' },
+    { en:'house', ko:'집, 주택' },
+    { en:'home', ko:'(가족이 함께 사는) 집, 가정; 집에, 집으로' },
+    { en:'floor', ko:'바닥; (건물의) 층' },
+    { en:'elevator', ko:'엘리베이터' },
+    { en:'ceiling', ko:'천장' },
+    { en:'garden', ko:'정원, 뜰' },
+    { en:'bench', ko:'벤치, 긴 의자' },
+    { en:'mix', ko:'섞다, 혼합하다' },
+    { en:'style', ko:'방식; (옷 등의) 스타일' },
+    { en:'design', ko:'디자인; 디자인하다, 설계하다' },
+    { en:'nice', ko:'좋은, 멋진' },
+    { en:'hard', ko:'단단한, 딱딱한; 어려운; 열심히' },
+    { en:'soft', ko:'부드러운, 푹신한' },
+    { en:'useful', ko:'유용한' },
+    { en:'tired', ko:'피곤한, 지친' },
+    { en:'near', ko:'가까운; 가까이; ~에서 가까이' },
+    { en:'bridge', ko:'다리' },
+    { en:'traffic', ko:'차량들, 교통(량)' },
+    { en:'station', ko:'역, 정거장' },
+  ]},
+  { id:'u50', num:50, title:'Unit 50', desc:'직업', words:[
+    { en:'job', ko:'일, 직장, 직업' },
+    { en:'become', ko:'~이 되다' },
+    { en:'scientist', ko:'과학자' },
+    { en:'farmer', ko:'농부' },
+    { en:'police officer', ko:'경찰관' },
+    { en:'firefighter', ko:'소방관' },
+    { en:'writer', ko:'작가' },
+    { en:'singer', ko:'가수' },
+    { en:'musician', ko:'음악가, 뮤지션' },
+    { en:'artist', ko:'화가; 예술가' },
+    { en:'cook', ko:'요리사; 요리하다' },
+    { en:'designer', ko:'디자이너' },
+    { en:'model', ko:'(의류) 모델; (상품의) 모델; 모형' },
+    { en:'nurse', ko:'간호사' },
+    { en:'doctor', ko:'의사' },
+    { en:'dentist', ko:'치과의사' },
+    { en:'driver', ko:'운전자, 기사' },
+    { en:'president', ko:'대통령' },
+    { en:'lawyer', ko:'변호사' },
+    { en:'famous', ko:'유명한' },
+  ]},
+  { id:'u51', num:51, title:'Unit 51', desc:'사무/업무', words:[
+    { en:'office', ko:'사무실' },
+    { en:'business', ko:'사업; 일, 업무' },
+    { en:'work', ko:'일하다; 일' },
+    { en:'meeting', ko:'회의' },
+    { en:'report', ko:'보고(서); 보고하다' },
+    { en:'review', ko:'복습하다; 다시 검토하다; 검토' },
+    { en:'solve', ko:'풀다, 해결하다' },
+    { en:'information', ko:'정보' },
+    { en:'speech', ko:'연설' },
+    { en:'place', ko:'장소' },
+    { en:'check', ko:'확인하다, 점검하다; 확인, 점검' },
+    { en:'list', ko:'목록, 명단' },
+    { en:'set', ko:'놓다, 두다; 정하다' },
+    { en:'focus', ko:'집중하다, 집중시키다' },
+    { en:'print', ko:'인쇄하다' },
+    { en:'file', ko:'파일, 서류철; (컴퓨터) 파일' },
+    { en:'course', ko:'강좌, 코스' },
+    { en:'again', ko:'다시, 한 번 더' },
+    { en:'soon', ko:'곧, 머지않아' },
+    { en:'until', ko:'~까지' },
+  ]},
+  { id:'u52', num:52, title:'Unit 52', desc:'문제/약속', words:[
+    { en:'problem', ko:'문제; (시험 등의) 문제' },
+    { en:'mistake', ko:'실수' },
+    { en:'fault', ko:'잘못' },
+    { en:'matter', ko:'(처리해야 할) 문제, 일' },
+    { en:'reason', ko:'이유' },
+    { en:'lead', ko:'안내하다, 이끌다; (결과적으로) ~에 이르다' },
+    { en:'handle', ko:'손잡이; 다루다, 처리하다' },
+    { en:'only', ko:'오직, 유일한' },
+    { en:'true', ko:'사실인; 진짜의' },
+    { en:'stupid', ko:'어리석은' },
+    { en:'fact', ko:'사실' },
+    { en:'secret', ko:'비밀' },
+    { en:'advice', ko:'충고, 조언' },
+    { en:'excuse', ko:'변명' },
+    { en:'promise', ko:'약속; 약속하다' },
+    { en:'keep', ko:'유지하다; (약속, 비밀 등을) 지키다' },
+    { en:'believe', ko:'믿다' },
+    { en:'mean', ko:'의미하다, 뜻하다' },
+    { en:'strange', ko:'이상한' },
+    { en:'nervous', ko:'긴장한, 초조한' },
+  ]},
+  { id:'u53', num:53, title:'Unit 53', desc:'생각/의견', words:[
+    { en:'wrong', ko:'틀린, 잘못된' },
+    { en:'sure', ko:'확신하는, 확실히 아는' },
+    { en:'idea', ko:'생각, 아이디어' },
+    { en:'opinion', ko:'의견' },
+    { en:'think', ko:'생각하다' },
+    { en:'guess', ko:'추측하다, 짐작하다' },
+    { en:'discuss', ko:'논의하다, 토론하다' },
+    { en:'forget', ko:'잊다, 잊어버리다' },
+    { en:'remember', ko:'기억하다' },
+    { en:'plan', ko:'계획; 계획하다' },
+    { en:'hope', ko:'바라다, 희망하다; 희망' },
+    { en:'know', ko:'알다' },
+    { en:'communicate', ko:'의사소통을 하다' },
+    { en:'complain', ko:'불평하다, 항의하다' },
+    { en:'both', ko:'양쪽의, 둘 다의' },
+    { en:'important', ko:'중요한' },
+    { en:'give', ko:'주다' },
+    { en:'agree', ko:'동의하다' },
+    { en:'share', ko:'공유하다' },
+    { en:'talk', ko:'말하다, 이야기하다' },
+  ]},
+  { id:'u54', num:54, title:'Unit 54', desc:'세계/문화', words:[
+    { en:'global', ko:'세계적인, 지구의' },
+    { en:'foreign', ko:'외국의' },
+    { en:'culture', ko:'문화' },
+    { en:'history', ko:'역사' },
+    { en:'traditional', ko:'전통의, 전통적인' },
+    { en:'modern', ko:'현대의, 현대적인' },
+    { en:'smile', ko:'미소 짓다; 미소' },
+    { en:'gesture', ko:'몸짓, 제스처' },
+    { en:'heart', ko:'마음; 심장' },
+    { en:'accept', ko:'받아들이다, 인정하다' },
+    { en:'follow', ko:'따라가다[오다]; 따르다' },
+    { en:'human', ko:'인간의, 인류의; 인간, 사람' },
+    { en:'kill', ko:'죽이다' },
+    { en:'fight', ko:'싸우다; 싸움' },
+    { en:'war', ko:'전쟁' },
+    { en:'peace', ko:'평화' },
+    { en:'flag', ko:'(국)기, 깃발' },
+    { en:'same', ko:'같은' },
+    { en:'different', ko:'다른' },
+    { en:'chance', ko:'기회; 가능성' },
+  ]},
+  { id:'u55', num:55, title:'Unit 55', desc:'우주/과학', words:[
+    { en:'robot', ko:'로봇' },
+    { en:'rocket', ko:'로켓' },
+    { en:'control', ko:'지배하다; 통제[제어]하다; 지배; 통제[제어]' },
+    { en:'engineer', ko:'기술자, 엔지니어' },
+    { en:'energy', ko:'에너지' },
+    { en:'power', ko:'힘; 권력; 동력' },
+    { en:'heat', ko:'열, 열기' },
+    { en:'space', ko:'우주; 공간' },
+    { en:'spaceship', ko:'우주선' },
+    { en:'astronaut', ko:'우주 비행사' },
+    { en:'step', ko:'(발)걸음; 단계' },
+    { en:'real', ko:'진짜의, 현실적인' },
+    { en:'trouble', ko:'곤란, 문제' },
+    { en:'put', ko:'놓다, 두다, 넣다' },
+    { en:'let', ko:'~하게 하다, 허락하다' },
+    { en:'other', ko:'(그 밖의) 다른; 다른 사람[것]' },
+    { en:'piece', ko:'한 부분[조각]' },
+    { en:'lucky', ko:'행운의, 운이 좋은' },
+    { en:'well', ko:'잘' },
+    { en:'yet', ko:'아직' },
+  ]},
 ];
 
 /* =========================================================
@@ -2348,7 +3521,7 @@ const HomeView = ({onStart, progress, onReports, onStats, onReading, onEgu}) => 
                 className="py-4 rounded-2xl bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 text-sm font-bold transition flex flex-col items-center justify-center gap-1">
           <span className="text-2xl">📚</span>
           <span>EGU 어휘</span>
-          <span className="text-xs font-normal text-stone-500">{eguDone}/20</span>
+          <span className="text-xs font-normal text-stone-500">{eguDone}/{EGU_TOTAL}</span>
         </button>
       </div>
 
@@ -2364,7 +3537,7 @@ const HomeView = ({onStart, progress, onReports, onStats, onReading, onEgu}) => 
       </div>
 
       <div className="mt-8 text-center text-xs text-stone-400">
-        Level 1~5 · {TOTAL} 단어 · 독해 12 · EGU 20 · 골든샘플 v8
+        Level 1~5 · {TOTAL} 단어 · 독해 12 · EGU {EGU_TOTAL} · 골든샘플 v9
       </div>
     </div>
   );
@@ -2966,35 +4139,51 @@ const ReadingDetailView = ({readingId, onBack, onHome, progress, setProgress}) =
 };
 
 /* =========================================================
-   14.9) EGU 어휘 (D) — 테마 목록
+   14.9) EGU 어휘 (D) — Unit 목록 (55 units)
    ========================================================= */
-const EguListView = ({onPick, onHome, progress}) => {
+// Unit 번호로 색상 자동 부여 (55개 색상 사이클)
+const UNIT_COLORS = [
+  '#FF7A45','#F59E0B','#16A34A','#2563EB','#9333EA',
+  '#EF4444','#D97706','#059669','#0284C7','#7E22CE',
+  '#0E7490','#0D9488','#15803D','#65A30D','#CA8A04',
+  '#B45309','#DC2626','#EA580C','#0EA5E9','#7C3AED',
+  '#0891B2','#BE185D','#EC4899','#3B82F6','#10B981',
+  '#F97316','#6366F1','#84CC16','#06B6D4','#A855F7'
+];
+const unitColor = (n) => UNIT_COLORS[(n-1) % UNIT_COLORS.length];
+
+const EGU_TOTAL = EGU_UNITS.reduce((a,u) => a + u.words.length, 0);
+
+const EguListView = ({onPick, onPrint, onHome, progress}) => {
   const eguDone = progress?.egu || {};
+  const doneCount = Object.keys(eguDone).filter(k => eguDone[k].learned).length;
   return (
     <div>
-      <TopBar onHome={onHome} title="📚 EGU 어휘" right={`${Object.keys(eguDone).filter(k=>eguDone[k].learned).length}/20`}/>
-      <div className="max-w-2xl mx-auto px-5 py-6 pop-in">
-        <p className="text-stone-600 mb-5">주제별로 묶은 기본 어휘예요. 4개 테마, 각 5단어.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {EGU_THEMES.map(t => {
-            const done = t.words.filter(w => eguDone[w.en]?.learned).length;
+      <TopBar onHome={onHome} title="📚 EGU 어휘" right={`${doneCount}/${EGU_TOTAL}`}/>
+      <div className="max-w-4xl mx-auto px-5 py-6 pop-in">
+        <p className="text-stone-600 mb-4">「EGU 영단어 &amp; 품사」 책의 Unit 1~55 (총 {EGU_TOTAL}단어)</p>
+
+        <button onClick={onPrint}
+                className="w-full mb-5 py-4 rounded-2xl bg-stone-800 hover:bg-stone-900 text-white text-base font-bold shadow-sm transition flex items-center justify-center gap-2">
+          📝 단어 시험지 만들기 (단원 선택 → 인쇄)
+        </button>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {EGU_UNITS.map(u => {
+            const done = u.words.filter(w => eguDone[w.en]?.learned).length;
+            const pct = (done/u.words.length)*100;
+            const color = unitColor(u.num);
             return (
-              <button key={t.id} onClick={() => onPick(t.id)}
-                      className="text-left bg-white rounded-3xl border border-stone-200 p-6 hover:shadow-md hover:-translate-y-0.5 transition no-select">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl"
-                       style={{background: t.color+'22'}}>{t.emoji}</div>
-                  <div className="flex-1">
-                    <div className="font-extrabold text-xl text-stone-800">{t.label}</div>
-                    <div className="text-stone-500 text-sm">{t.desc}</div>
-                  </div>
+              <button key={u.id} onClick={() => onPick(u.id)}
+                      className="text-left bg-white rounded-2xl border border-stone-200 p-3 hover:shadow-md hover:-translate-y-0.5 transition no-select">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
+                       style={{background: color}}>U{String(u.num).padStart(2,'0')}</div>
+                  <div className="text-xs text-stone-500">{done}/{u.words.length}</div>
                 </div>
-                <div className="flex justify-between text-xs text-stone-500 mb-1">
-                  <span>진도</span>
-                  <span>{done}/{t.words.length}</span>
-                </div>
-                <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
-                  <div className="h-full transition-all" style={{width:`${(done/t.words.length)*100}%`, background: t.color}}/>
+                <div className="text-sm font-bold text-stone-800 leading-tight mb-2">{u.desc}</div>
+                <div className="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
+                  <div className="h-full transition-all" style={{width:`${pct}%`, background: color}}/>
                 </div>
               </button>
             );
@@ -3006,12 +4195,15 @@ const EguListView = ({onPick, onHome, progress}) => {
 };
 
 /* =========================================================
-   14.10) EGU 어휘 (D) — 테마 상세 화면
+   14.10) EGU 어휘 (D) — Unit 상세 화면
    ========================================================= */
 const EguThemeView = ({themeId, onBack, onHome, progress, setProgress}) => {
-  const theme = EGU_THEMES.find(t => t.id === themeId);
+  const unit = EGU_UNITS.find(u => u.id === themeId);
   const [playingWord, setPlayingWord] = useState(null);
   const eguDone = progress?.egu || {};
+
+  if (!unit) return null;
+  const color = unitColor(unit.num);
 
   const playWord = (w) => {
     if (playingWord === w.en) {
@@ -3032,51 +4224,43 @@ const EguThemeView = ({themeId, onBack, onHome, progress, setProgress}) => {
     });
   };
 
-  const done = theme.words.filter(w => eguDone[w.en]?.learned).length;
+  const done = unit.words.filter(w => eguDone[w.en]?.learned).length;
 
   return (
     <div>
-      <TopBar onHome={onHome} title={`📚 ${theme.label}`} right={`${done}/${theme.words.length}`}/>
+      <TopBar onHome={onHome} title={`📚 ${unit.title}`} right={`${done}/${unit.words.length}`}/>
       <div className="max-w-2xl mx-auto px-5 py-6 pop-in">
         <button onClick={onBack}
                 className="text-sm text-stone-500 hover:text-stone-800 mb-4 flex items-center gap-1">
-          ← 테마 목록으로
+          ← Unit 목록으로
         </button>
 
-        <div className="bg-white rounded-3xl border border-stone-200 p-6 mb-4">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl"
-                 style={{background: theme.color+'22'}}>{theme.emoji}</div>
-            <div>
-              <div className="text-2xl font-extrabold text-stone-800">{theme.label}</div>
-              <div className="text-stone-500 text-sm">{theme.desc}</div>
-            </div>
-          </div>
+        <div className="rounded-3xl p-6 mb-4 text-white" style={{background: color}}>
+          <div className="text-sm opacity-80">Unit {String(unit.num).padStart(2,'0')}</div>
+          <div className="text-2xl font-extrabold">{unit.desc}</div>
+          <div className="text-sm opacity-90 mt-1">{unit.words.length} 단어</div>
         </div>
 
-        <div className="space-y-3">
-          {theme.words.map(w => {
+        <div className="space-y-2">
+          {unit.words.map(w => {
             const learned = !!eguDone[w.en]?.learned;
             return (
               <div key={w.en}
-                   className={`rounded-2xl border p-4 transition ${
+                   className={`rounded-2xl border p-3 transition ${
                      learned ? 'bg-green-50 border-green-300' : 'bg-white border-stone-200'
                    }`}>
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl flex-shrink-0"
-                       style={{background: theme.color+'22'}}>{w.emoji}</div>
+                <div className="flex items-center gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="text-xl font-extrabold text-stone-800 word-en">{w.en}</div>
+                    <div className="text-lg font-extrabold text-stone-800 word-en">{w.en}</div>
                     <div className="text-stone-600 text-sm">{w.ko}</div>
-                    <div className="text-stone-400 text-xs mt-0.5">[{w.fast}]</div>
                   </div>
                   <button onClick={() => playWord(w)}
-                          className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white text-xl transition"
-                          style={{background: playingWord === w.en ? '#94A3B8' : theme.color}}>
+                          className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-white text-lg transition"
+                          style={{background: playingWord === w.en ? '#94A3B8' : color}}>
                     {playingWord === w.en ? '⏸' : '🔊'}
                   </button>
                   <button onClick={() => toggleLearned(w.en)}
-                          className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-xl transition border-2 ${
+                          className={`flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center text-lg transition border-2 ${
                             learned ? 'bg-green-500 text-white border-green-500' : 'bg-white border-stone-300 text-stone-300 hover:border-green-400 hover:text-green-400'
                           }`}
                           title={learned ? '학습 완료 (취소하려면 클릭)' : '학습 완료 체크'}>
@@ -3087,6 +4271,301 @@ const EguThemeView = ({themeId, onBack, onHome, progress, setProgress}) => {
             );
           })}
         </div>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
+   14.11) 단어 시험지 인쇄 (G) — 단원 선택, 유형 선택, 인쇄
+   ========================================================= */
+const PrintTestView = ({onHome}) => {
+  const [selected, setSelected] = useState(new Set());
+  const [testType, setTestType] = useState('en2ko'); // 'en2ko' or 'ko2en'
+  const [includeTest, setIncludeTest] = useState(true);
+  const [includeAnswer, setIncludeAnswer] = useState(true);
+  const [shuffle, setShuffle] = useState(false);
+  const [columns, setColumns] = useState(2);
+
+  const toggleUnit = (id) => {
+    setSelected(prev => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  };
+  const selectAll = () => setSelected(new Set(EGU_UNITS.map(u => u.id)));
+  const selectNone = () => setSelected(new Set());
+  const selectRange = (start, end) => {
+    setSelected(prev => {
+      const n = new Set(prev);
+      for (let i = start; i <= end; i++) {
+        const u = EGU_UNITS.find(x => x.num === i);
+        if (u) n.add(u.id);
+      }
+      return n;
+    });
+  };
+
+  const selectedUnits = EGU_UNITS.filter(u => selected.has(u.id));
+  const totalWords = selectedUnits.reduce((a,u) => a + u.words.length, 0);
+
+  const buildPrintHTML = () => {
+    // Gather words in order, optionally shuffle
+    let words = [];
+    for (const u of selectedUnits) {
+      for (const w of u.words) words.push({...w, unit: u.num});
+    }
+    if (shuffle) {
+      // Fisher-Yates
+      for (let i = words.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i+1));
+        [words[i], words[j]] = [words[j], words[i]];
+      }
+    }
+    const unitsLabel = selectedUnits.map(u => `U${String(u.num).padStart(2,'0')}`).join(', ');
+    const typeLabel = testType === 'en2ko' ? '영어 → 한글 뜻 쓰기' : '한글 뜻 → 영어 스펠링 쓰기';
+    const today = new Date().toLocaleDateString('ko-KR');
+
+    const rows = (showAnswer) => {
+      const colItems = Array.from({length: columns}, () => []);
+      words.forEach((w, i) => {
+        const col = Math.floor(i / Math.ceil(words.length / columns));
+        const safeCol = Math.min(col, columns - 1);
+        const question = testType === 'en2ko' ? w.en : w.ko;
+        const answer = testType === 'en2ko' ? w.ko : w.en;
+        colItems[safeCol].push({num: i+1, q: question, a: answer});
+      });
+      return colItems.map(items => `
+        <div class="col">
+          ${items.map(it => `
+            <div class="q-row">
+              <span class="q-num">${it.num}.</span>
+              <span class="q-text">${it.q.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</span>
+              ${showAnswer
+                ? `<span class="ans-text">${it.a.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</span>`
+                : `<span class="blank">_________________</span>`}
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    };
+
+    const sheet = (title, showAnswer) => `
+      <section class="sheet">
+        <header class="head">
+          <div>
+            <div class="brand">베스트교육 호매실캠퍼스 · ☎ 031-292-2828</div>
+            <h1>${title}</h1>
+            <div class="meta">단원: ${unitsLabel} · 유형: ${typeLabel} · 총 ${words.length}문제</div>
+          </div>
+          <div class="info">
+            <div>이름: <span class="ul"></span></div>
+            <div>점수: <span class="ul-sm"></span> / ${words.length}</div>
+            <div class="date">${today}</div>
+          </div>
+        </header>
+        <div class="grid cols-${columns}">
+          ${rows(showAnswer)}
+        </div>
+      </section>
+    `;
+
+    return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>EGU 단어 시험지 — ${unitsLabel}</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo',sans-serif; color: #1f2937; margin: 0; padding: 0; }
+  .sheet { padding: 14mm 12mm; page-break-after: always; }
+  .sheet:last-child { page-break-after: auto; }
+  .head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1f2937; padding-bottom: 8px; margin-bottom: 14px; }
+  .brand { font-size: 10pt; color: #6b7280; margin-bottom: 4px; }
+  .head h1 { font-size: 18pt; font-weight: 800; margin: 0 0 4px 0; }
+  .meta { font-size: 9.5pt; color: #6b7280; }
+  .info { font-size: 10pt; text-align: right; line-height: 1.7; }
+  .info .ul { display:inline-block; border-bottom:1px solid #1f2937; min-width:80px; }
+  .info .ul-sm { display:inline-block; border-bottom:1px solid #1f2937; min-width:35px; text-align:center; }
+  .info .date { color:#9ca3af; font-size: 9pt; margin-top: 4px; }
+  .grid { display: grid; gap: 0 12mm; }
+  .grid.cols-1 { grid-template-columns: 1fr; }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .col { display: flex; flex-direction: column; }
+  .q-row { display: flex; align-items: baseline; padding: 5.5px 0; border-bottom: 1px dotted #d1d5db; font-size: 10.5pt; }
+  .q-num { color: #6b7280; min-width: 28px; }
+  .q-text { font-weight: 600; flex: 0 0 auto; margin-right: 8px; }
+  .blank { flex: 1; color: transparent; }
+  .ans-text { flex: 1; color: #dc2626; font-weight: 700; }
+  .answer-sheet .head h1::before { content: '✅ '; color: #16a34a; }
+  @page { size: A4 portrait; margin: 0; }
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none !important; }
+  }
+  .toolbar { background:#f3f4f6; padding:10px 16px; border-bottom:1px solid #d1d5db; display:flex; gap:8px; align-items:center; font-size: 10pt; }
+  .toolbar button { padding: 6px 14px; border: 1px solid #6b7280; background: white; border-radius: 6px; cursor: pointer; font-size: 10pt; }
+  .toolbar button.primary { background: #2563eb; color: white; border-color: #2563eb; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="toolbar no-print">
+  <button class="primary" onclick="window.print()">🖨 인쇄하기</button>
+  <button onclick="window.close()">닫기</button>
+  <span style="margin-left:auto; color:#6b7280;">시험지 ${includeTest?'O':'X'} · 정답지 ${includeAnswer?'O':'X'} · ${words.length}문제</span>
+</div>
+${includeTest ? sheet('EGU 단어 시험지', false) : ''}
+${includeAnswer ? `<div class="answer-sheet">${sheet('EGU 단어 시험지 — 정답지', true)}</div>` : ''}
+</body>
+</html>`;
+  };
+
+  const handlePrint = () => {
+    if (selected.size === 0) {
+      alert('하나 이상의 단원을 선택해주세요.');
+      return;
+    }
+    if (!includeTest && !includeAnswer) {
+      alert('시험지나 정답지 중 하나는 켜져 있어야 해요.');
+      return;
+    }
+    const win = window.open('', '_blank', 'width=900,height=900');
+    if (!win) {
+      alert('팝업이 차단되었어요. 팝업 차단을 해제한 뒤 다시 시도해주세요.');
+      return;
+    }
+    win.document.write(buildPrintHTML());
+    win.document.close();
+  };
+
+  return (
+    <div>
+      <TopBar onHome={onHome} title="📝 단어 시험지 만들기" right={selected.size > 0 ? `${selected.size}단원, ${totalWords}문제` : '단원 선택'}/>
+      <div className="max-w-4xl mx-auto px-5 py-6 pop-in space-y-4">
+
+        {/* 1. 단원 선택 */}
+        <div className="bg-white rounded-3xl border border-stone-200 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-bold text-stone-800">① 단원 선택 (다중 가능)</h2>
+            <div className="flex gap-2 text-xs">
+              <button onClick={selectAll} className="px-3 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700">전체</button>
+              <button onClick={selectNone} className="px-3 py-1 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700">해제</button>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1.5 mb-3 text-xs">
+            <span className="text-stone-500 mr-2 py-1">빠른 선택:</span>
+            <button onClick={() => selectRange(1,10)} className="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700">1~10</button>
+            <button onClick={() => selectRange(11,20)} className="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700">11~20</button>
+            <button onClick={() => selectRange(21,30)} className="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700">21~30</button>
+            <button onClick={() => selectRange(31,40)} className="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700">31~40</button>
+            <button onClick={() => selectRange(41,50)} className="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700">41~50</button>
+            <button onClick={() => selectRange(51,55)} className="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700">51~55</button>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            {EGU_UNITS.map(u => {
+              const sel = selected.has(u.id);
+              const color = unitColor(u.num);
+              return (
+                <button key={u.id} onClick={() => toggleUnit(u.id)}
+                        className={`text-left p-2.5 rounded-xl border-2 transition no-select ${
+                          sel ? 'border-stone-800 bg-stone-50' : 'border-stone-200 bg-white hover:border-stone-400'
+                        }`}>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                      sel ? 'bg-stone-800 text-white' : 'border-2 border-stone-300'
+                    }`}>{sel ? '✓' : ''}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold" style={{color}}>U{String(u.num).padStart(2,'0')}</div>
+                      <div className="text-xs text-stone-700 truncate">{u.desc}</div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2. 시험 유형 */}
+        <div className="bg-white rounded-3xl border border-stone-200 p-5">
+          <h2 className="font-bold text-stone-800 mb-3">② 시험 유형</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button onClick={() => setTestType('en2ko')}
+                    className={`p-4 rounded-2xl border-2 text-left transition ${
+                      testType === 'en2ko' ? 'border-blue-500 bg-blue-50' : 'border-stone-200 hover:border-stone-400'
+                    }`}>
+              <div className="font-bold text-stone-800 mb-1">🇺🇸 영어 → 🇰🇷 한글</div>
+              <div className="text-xs text-stone-500">apple → ____ (사과)</div>
+            </button>
+            <button onClick={() => setTestType('ko2en')}
+                    className={`p-4 rounded-2xl border-2 text-left transition ${
+                      testType === 'ko2en' ? 'border-blue-500 bg-blue-50' : 'border-stone-200 hover:border-stone-400'
+                    }`}>
+              <div className="font-bold text-stone-800 mb-1">🇰🇷 한글 → 🇺🇸 영어</div>
+              <div className="text-xs text-stone-500">사과 → ____ (apple)</div>
+            </button>
+          </div>
+        </div>
+
+        {/* 3. 출력 옵션 */}
+        <div className="bg-white rounded-3xl border border-stone-200 p-5">
+          <h2 className="font-bold text-stone-800 mb-3">③ 출력 옵션</h2>
+          <div className="space-y-2">
+            <label className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 cursor-pointer hover:bg-stone-100">
+              <input type="checkbox" checked={includeTest} onChange={(e)=>setIncludeTest(e.target.checked)}
+                     className="w-5 h-5"/>
+              <div>
+                <div className="font-semibold text-stone-800">시험지 출력</div>
+                <div className="text-xs text-stone-500">학생용 빈 답란 시험지</div>
+              </div>
+            </label>
+            <label className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 cursor-pointer hover:bg-stone-100">
+              <input type="checkbox" checked={includeAnswer} onChange={(e)=>setIncludeAnswer(e.target.checked)}
+                     className="w-5 h-5"/>
+              <div>
+                <div className="font-semibold text-stone-800">정답지 출력</div>
+                <div className="text-xs text-stone-500">선생님용 정답이 적힌 채점지</div>
+              </div>
+            </label>
+            <label className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 cursor-pointer hover:bg-stone-100">
+              <input type="checkbox" checked={shuffle} onChange={(e)=>setShuffle(e.target.checked)}
+                     className="w-5 h-5"/>
+              <div>
+                <div className="font-semibold text-stone-800">문제 순서 섞기</div>
+                <div className="text-xs text-stone-500">단원 순서 대신 무작위로 배치</div>
+              </div>
+            </label>
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-stone-50">
+              <div className="font-semibold text-stone-800 flex-1">레이아웃</div>
+              <select value={columns} onChange={(e)=>setColumns(Number(e.target.value))}
+                      className="px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-sm">
+                <option value={1}>1단 컬럼</option>
+                <option value={2}>2단 컬럼 (권장)</option>
+                <option value={3}>3단 컬럼 (소형)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. 인쇄 버튼 */}
+        <div className="sticky bottom-0 bg-stone-50/95 backdrop-blur -mx-5 px-5 py-3 border-t border-stone-200">
+          <button onClick={handlePrint}
+                  disabled={selected.size === 0 || (!includeTest && !includeAnswer)}
+                  className={`w-full py-4 rounded-2xl text-lg font-bold shadow-md transition ${
+                    selected.size === 0 || (!includeTest && !includeAnswer)
+                      ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                      : 'bg-orange-500 hover:bg-orange-600 text-white'
+                  }`}>
+            🖨 시험지 미리보기 / 인쇄
+            {selected.size > 0 && ` (${selected.size}단원 · ${totalWords}문제)`}
+          </button>
+          <p className="text-xs text-stone-500 text-center mt-2">
+            새 창이 열리면 상단의 [🖨 인쇄하기]를 누르세요.
+          </p>
+        </div>
+
       </div>
     </div>
   );
@@ -3147,12 +4626,14 @@ const App = () => {
                                                        onBack={() => setView('reading')}
                                                        progress={progress} setProgress={setProgress}/>}
       {view === 'egu' && <EguListView onHome={goHome} progress={progress}
-                                      onPick={(id) => { setSelectedTheme(id); setView('egu-theme'); }}/>}
+                                      onPick={(id) => { setSelectedTheme(id); setView('egu-theme'); }}
+                                      onPrint={() => setView('print-test')}/>}
       {view === 'egu-theme' && <EguThemeView themeId={selectedTheme} onHome={goHome}
                                              onBack={() => setView('egu')}
                                              progress={progress} setProgress={setProgress}/>}
+      {view === 'print-test' && <PrintTestView onHome={goHome}/>}
       <footer className="text-center text-xs text-stone-400 py-6">
-        진짜 쉬운 파닉스 · 골든샘플 v8 · {TOTAL}단어 · 독해 12 · EGU 20
+        진짜 쉬운 파닉스 · 골든샘플 v9 · {TOTAL}단어 · 독해 12 · EGU {EGU_TOTAL}
       </footer>
     </div>
   );
