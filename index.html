@@ -2130,7 +2130,7 @@ const TOTAL = Object.values(WORDS).reduce((a,b)=>a+b.length,0);
 /* =========================================================
    10) 홈
    ========================================================= */
-const HomeView = ({onStart, progress}) => {
+const HomeView = ({onStart, progress, onReports, onStats}) => {
   const done = Object.values(progress.words||{}).filter(v => v.completed).length;
   return (
     <div className="max-w-2xl mx-auto px-5 py-8 pop-in">
@@ -2169,8 +2169,20 @@ const HomeView = ({onStart, progress}) => {
               className="w-full py-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold shadow-md transition">
         학습 시작하기 →
       </button>
+
+      <div className="grid grid-cols-2 gap-3 mt-3">
+        <button onClick={onStats}
+                className="py-3 rounded-2xl bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 text-sm font-semibold transition flex items-center justify-center gap-2">
+          📊 학습 통계
+        </button>
+        <button onClick={onReports}
+                className="py-3 rounded-2xl bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 text-sm font-semibold transition flex items-center justify-center gap-2">
+          ⚠️ 신고된 그림
+        </button>
+      </div>
+
       <div className="mt-8 text-center text-xs text-stone-400">
-        Level 1 · 단모음 (a · e · i · o · u) · {TOTAL} 단어 골든샘플 v2
+        Level 1~5 · {TOTAL} 단어 · 골든샘플 v7
       </div>
     </div>
   );
@@ -2473,6 +2485,145 @@ const ResultView = ({stageKey, score, onHome, onAgain, onNext}) => {
 };
 
 /* =========================================================
+   14.5) 신고된 그림 목록 화면
+   ========================================================= */
+const ReportsView = ({reports, setReports, onHome}) => {
+  const entries = Object.entries(reports || {});
+  const sorted = entries.sort((a,b) => (b[1].ts||0) - (a[1].ts||0));
+  const remove = (w) => setReports(p => { const n={...(p||{})}; delete n[w]; return n; });
+  return (
+    <div>
+      <TopBar onHome={onHome} title="신고된 그림 목록" right={`총 ${sorted.length}건`}/>
+      <div className="max-w-2xl mx-auto px-5 py-6 pop-in">
+        {sorted.length === 0 ? (
+          <div className="bg-white rounded-3xl border border-stone-200 p-10 text-center">
+            <div className="text-5xl mb-3">📭</div>
+            <h2 className="text-xl font-bold text-stone-700">아직 신고된 그림이 없어요</h2>
+            <p className="text-stone-500 mt-2 text-sm">단어 학습 중 그림이 이상하면 우측 상단 "⚠️ 그림 오류 신고" 버튼을 눌러주세요.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-stone-600 text-sm mb-3">학생이 신고한 그림 목록입니다. 향후 보강 작업의 우선순위로 사용됩니다.</p>
+            {sorted.map(([w, info]) => {
+              const stage = STAGES.find(s => s.key === info.stage);
+              const date = info.ts ? new Date(info.ts).toLocaleDateString('ko-KR') : '?';
+              return (
+                <div key={w} className="bg-white rounded-2xl border border-stone-200 p-4 flex items-center gap-4">
+                  <div className="w-16 h-16 flex-shrink-0"><Illustration word={w}/></div>
+                  <div className="flex-1">
+                    <div className="font-extrabold text-lg word-en text-stone-800">{w}</div>
+                    <div className="text-xs text-stone-500">
+                      {stage ? <span className="px-1.5 py-0.5 rounded" style={{background: stage.color+'22', color: stage.color}}>{stage.label}</span> : null}
+                      <span className="ml-2">{date}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => remove(w)} className="text-xs text-stone-400 hover:text-red-500 px-2 py-1">
+                    신고 취소
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
+   14.6) 학습 통계 대시보드
+   ========================================================= */
+const StatsView = ({progress, onHome}) => {
+  const words = progress?.words || {};
+  const completedWords = Object.entries(words).filter(([w,v]) => v.completed);
+  const total = Object.values(WORDS).reduce((a,b)=>a+b.length,0);
+  const done = completedWords.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  const stageStats = STAGES.map(s => {
+    const sw = WORDS[s.key] || [];
+    const sd = sw.filter(w => words[w.word]?.completed).length;
+    return { ...s, total: sw.length, done: sd, pct: sw.length ? Math.round(sd/sw.length*100) : 0 };
+  });
+  const byDay = {};
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now); d.setDate(now.getDate()-i);
+    byDay[d.toISOString().slice(0,10)] = 0;
+  }
+  for (const [w, info] of Object.entries(words)) {
+    if (info.ts) {
+      const k = new Date(info.ts).toISOString().slice(0,10);
+      if (k in byDay) byDay[k]++;
+    }
+  }
+  const dayKeys = Object.keys(byDay);
+  const maxCount = Math.max(1, ...Object.values(byDay));
+  const byLevel = {};
+  for (const s of stageStats) {
+    if (!byLevel[s.level]) byLevel[s.level] = { total:0, done:0 };
+    byLevel[s.level].total += s.total;
+    byLevel[s.level].done += s.done;
+  }
+  const levelLabel = {1:'단모음',2:'매직 e',3:'이중자음',4:'이중모음',5:'사이트워드',6:'독해'};
+  return (
+    <div>
+      <TopBar onHome={onHome} title="학습 통계" right={`${done}/${total}`}/>
+      <div className="max-w-2xl mx-auto px-5 py-6 pop-in space-y-4">
+        <div className="bg-white rounded-3xl border border-stone-200 p-6">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <div className="text-stone-500 text-sm">전체 진도</div>
+              <div className="text-3xl font-extrabold text-stone-800">{pct}<span className="text-base font-bold text-stone-500">%</span></div>
+            </div>
+            <div className="text-5xl">{pct===100 ? '🏆' : pct>=70 ? '🌳' : pct>=30 ? '🌿' : '🌱'}</div>
+          </div>
+          <div className="w-full h-4 bg-stone-100 rounded-full overflow-hidden">
+            <div className="h-full bg-orange-400 transition-all" style={{width:`${pct}%`}}/>
+          </div>
+          <div className="text-xs text-stone-500 mt-2">{done} / {total} 단어 학습 완료</div>
+        </div>
+        <div className="bg-white rounded-3xl border border-stone-200 p-6">
+          <div className="text-stone-500 text-sm mb-3">최근 7일 학습량</div>
+          <div className="flex items-end justify-between gap-1 h-32">
+            {dayKeys.map(k => {
+              const c = byDay[k];
+              const h = c === 0 ? 4 : Math.max(8, (c/maxCount)*100);
+              const d = new Date(k);
+              return (
+                <div key={k} className="flex-1 flex flex-col items-center gap-1">
+                  <div className="text-xs font-bold text-stone-700">{c||''}</div>
+                  <div className="w-full bg-orange-400 rounded-t-md" style={{height: h+'px', minHeight:'4px', opacity: c===0?0.2:1}}/>
+                  <div className="text-xs text-stone-500">{d.getDate()}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="bg-white rounded-3xl border border-stone-200 p-6">
+          <div className="text-stone-500 text-sm mb-3">Level별 진도</div>
+          <div className="space-y-2">
+            {Object.entries(byLevel).map(([lv, info]) => {
+              const p = info.total ? Math.round(info.done/info.total*100) : 0;
+              return (
+                <div key={lv}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-stone-700 font-semibold">Lv.{lv} {levelLabel[lv]||''}</span>
+                    <span className="text-stone-500">{info.done}/{info.total} ({p}%)</span>
+                  </div>
+                  <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-stone-700" style={{width:`${p}%`}}/>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================
    15) 메인 App
    ========================================================= */
 const App = () => {
@@ -2510,13 +2661,15 @@ const App = () => {
           ⚠️ {voiceWarning}
         </div>
       )}
-      {view === 'home' && <HomeView onStart={() => setView('map')} progress={progress}/>}
+      {view === 'home' && <HomeView onStart={() => setView('map')} progress={progress} onReports={() => setView('reports')} onStats={() => setView('stats')}/>}
       {view === 'map' && <StageMapView onHome={goHome} onPickStage={(k) => { setStageKey(k); setView('lesson'); }} progress={progress}/>}
       {view === 'lesson' && <LessonView stageKey={stageKey} onHome={goHome} setProgress={setProgress} reports={reports} setReports={setReports} onDone={() => setView('quiz')}/>}
       {view === 'quiz' && <QuizView stageKey={stageKey} onHome={goHome} onDone={(score) => { setLastScore(score); setView('result'); }}/>}
       {view === 'result' && <ResultView stageKey={stageKey} score={lastScore} onHome={goHome} onAgain={() => setView('lesson')} onNext={(k) => { setStageKey(k); setView('lesson'); }}/>}
+      {view === 'reports' && <ReportsView reports={reports} setReports={setReports} onHome={goHome}/>}
+      {view === 'stats' && <StatsView progress={progress} onHome={goHome}/>}
       <footer className="text-center text-xs text-stone-400 py-6">
-        진짜 쉬운 파닉스 · 골든샘플 v2 · 단모음 {TOTAL}단어
+        진짜 쉬운 파닉스 · 골든샘플 v7 · {TOTAL}단어
       </footer>
     </div>
   );
